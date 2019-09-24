@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+<head>
+    <meta charset="UTF-8">
+    <title>业务报表系统 - 绩效数据</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    {# <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>#}
+    <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0,minimum-scale=0.4,maximum-scale=3.0"/>
+    <link rel="stylesheet" href="../static/css/font.css">
+    <link rel="stylesheet" href="../static/css/xadmin.css">
+    <script src="../static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../static/js/xadmin.js"></script>
+    <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+<body>
+<div class="x-nav">
+          <span class="layui-breadcrumb">
+            <a href="/index/">首页</a><a><cite>绩效数据</cite></a>
+          </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <div class="layui-form layui-col-space5">
+                        <div class="layui-inline layui-show-xs-block">
+                            <input class="layui-input" placeholder="日期范围" name="date-range" id="date-range">
+                        </div>
+
+                        <div class="layui-inline layui-show-xs-block">
+                            <select name="group-name" id="group-name">
+                                <option value="">组别</option>
+                            </select>
+                        </div>
+
+                        <div class="layui-inline layui-show-xs-block">
+                            <select id="username" name="username" lay-verify="" lay-search>
+                                <option value="">花名</option>
+                            </select>
+                        </div>
+
+                        <div class="layui-inline layui-show-xs-block">
+                            <button id="search" class="layui-btn" lay-filter="search" onclick="search();return false;"><i class="layui-icon">&#xe615;</i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-card-body ">
+                    <table class="layui-hide" id="performance-data" lay-filter="performance-data"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="tool-top">
+    <div class="layui-btn-container">
+        <button type="button" class="layui-btn layui-btn-danger" lay-event="delall"><i class="layui-icon"></i>批量删除</button>
+        <button type="button" class="layui-btn" lay-event="add"><i class="layui-icon"></i>添加数据</button>
+    </div>
+</script>
+
+<script type="text/html" id="tool-right">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script>
+    layui.use(['form', 'laydate', 'table'], function () {
+        //var $ = layui.jquery;
+        var table = layui.table;
+        var laydate = layui.laydate;
+        var form = layui.form;
+
+        loadSearchData(); //加载搜索栏数据
+
+        laydate.render({
+            elem: '#date-range', range: true
+        });
+
+
+        table.render({
+            elem: '#performance-data',
+            {#url: '/api/performance-data/',#}
+            url: '/api/performance-data/?group_id=' + $('#group-name').val() + '&date_range=' + $('#date-range').val() + '&person_id=' + $('#username').val(),
+            toolbar: '#tool-top',
+            defaultToolbar: [
+                'filter', 'exports', 'print', {
+                    title: '提示',
+                    layEvent: 'LAYTABLE_TIPS',
+                    icon: 'layui-icon-tips'
+                }
+            ],
+            cellMinWidth: 80,
+            height: 'full-200',
+            title: '用户数据表',
+            cols: [[
+                {type: 'checkbox', fixed: 'left'},
+                {field: 'data_time', title: '数据日期', width: 120, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                {field: 'id', title: 'ID', width: 80, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                {field: 'person_name', title: '用户名', align: 'center', width: 120, sort: true},
+                {field: 'group_name', title: '组别', align: 'center', width: 100, sort: true},
+                {field: 'new_addition_volume', title: '新加量', sort: true, align: 'center', width: 100},
+                {field: 'talkable_volume', title: '可聊量', align: 'center', width: 100, sort: true},
+                {field: 'work_customer_volume', title: 'Work客户量', sort: true, align: 'center', width: 120},
+                {field: 'transaction_volume', title: '成交量', sort: true, align: 'center', width: 100},
+                {fixed: 'right', title: '操作', toolbar: '#tool-right', width: 150, align: 'center'}
+            ]],
+            page: true,
+            limit: 30,
+            parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data
+                };
+            }
+        });
+
+        //头工具栏事件
+        table.on('toolbar(performance-data)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            var data = checkStatus.data;
+            switch (obj.event) {
+                case 'delall':
+                    console.log(JSON.stringify(data));
+                    var id = [], clickedArr = [];
+                    for (var i = 0; i < data.length; i++) {
+                        clickedArr[data[i].id] = i;
+                        id.push(data[i].id);
+                    }
+                    if(id.length <= 0){
+                        layer.msg('请选择要删除的数据', {icon: 2, time: 1000});
+                        break;
+                    }
+                    console.log(id);
+                    console.log(clickedArr);
+                    layer.confirm('确认删除选定成员吗?', function (index) {
+                        $.ajax({
+                            url: '/api/performance-data/',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                'operating': 'delall',
+                                'id': JSON.stringify(id)
+                            },
+                            success: function (data) {
+                                if (data.code === 0) {
+                                    $.each(clickedArr, function (k) {
+                                        $("tr[data-index=" + clickedArr[k] + "]").remove();
+                                    });
+                                    search();
+                                    layer.msg(data.msg, {icon: 1, time: 1000});
+                                } else {
+                                    layer.msg(data.msg, {icon: 2, time: 1000});
+                                }
+                            },
+                            error: function (error) {
+                                layer.alert(error.msg, {icon: 2, time: 1000});
+                            }
+                        })
+                    });
+                    break;
+                case 'add':
+                    var username = $('#username').val();
+                    var group = $('#group-name').val();
+                    var date_range = $('#date-range').val();
+                    var search_value = '&search={\'person_id\':\'' + username + '\',\'group_id\':\'' + group + '\',\'date_range\':\'' + date_range + '\'}';
+                    layer.open({
+                        type: 2,
+                        title: '添加新增数据',
+                        content: ['/api/performance-data/?event=add' + search_value],
+                        area: ['460px', '460px']
+                    });
+                    break;
+                case 'LAYTABLE_TIPS':
+                    layer.alert('保留功能');
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(performance-data)', function (obj) {
+            var data = obj.data;
+            console.log(obj);
+            if (obj.event === 'del') {
+                layer.confirm('确认删除【' + obj.data.id + '】吗?', function (index) {
+                    $.ajax({
+                        url: '/api/performance-data/',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            'operating': 'delone',
+                            'id': obj.data.id
+                        },
+                        success: function (data) {
+                            if (data.code === 0) {
+                                layer.msg(data.msg, {icon: 1, time: 1000});
+                                obj.del();
+                                layer.close(index);
+                            } else {
+                                layer.msg(data.msg, {icon: 2, time: 1000});
+                            }
+                        },
+                        error: function (error) {
+                            layer.alert(error.msg, {icon: 2, time: 1000});
+                        }
+                    });
+                });
+            } else if (obj.event === 'edit') {
+                var username = $('#username').val();
+                var group = $('#group-name').val();
+                var date_range = $('#date-range').val();
+
+                if (username === '') {
+                    username = "undefined";
+                }
+                if (group === '') {
+                    group = "undefined";
+                }
+
+                if (date_range === '') {
+                    date_range = "undefined";
+                }
+
+                var search_value = '&search={\'person_id\':\'' + username + '\',\'group_id\':\'' + group + '\',\'date_range\':\'' + date_range + '\'}';
+                layer.open({
+                    type: 2,
+                    title: '编辑数据【' + data.id + '】',
+                    {#content: ['/api/performance-data/?event=edit&id=' + data.id, 'no'],//禁用滚动条#}
+                    content: ['/api/performance-data/?event=edit&id=' + data.id + search_value],
+                    area: ['460px', '600px']
+                });
+            }
+        });
+    });
+
+    function loadSearchData() {
+        $.ajax({
+            url: '/api/person-group-name-data/',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                if (data.code === 0) {
+                    console.log(data);
+                    $.each(data.data.group, function (index) {
+                        console.log(data.data.group[index]);
+                        var option = "<option value=\"" + data.data.group[index].id + "\">" + data.data.group[index].name + "</option>";
+                        $("select[id=group-name]").append(option);
+                    });
+                    $.each(data.data.person, function (index) {
+                        console.log(data.data.person[index]);
+                        var option = "<option value=\"" + data.data.person[index].id + "\">" + data.data.person[index].name + "</option>";
+                        $("select[id=username]").append(option);
+                    });
+                    layui.form.render();
+                } else {
+                    layer.msg(data.msg, {icon: 2, time: 1000});
+                }
+            },
+            error: function (error) {
+                layer.alert(error.msg, {icon: 2, time: 1000});
+            }
+        });
+    }
+
+    function search() {
+        console.log('日期选择：' + $('#date-range').val());
+        console.log('组别：' + $('#group-name').val());
+        console.log('花名：' + $('#username').val());
+        layui.table.reload('performance-data', {
+            url: '/api/performance-data/?person_id=' + $('#username').val() + '&group_id=' + $('#group-name').val() + '&date_range=' + $('#date-range').val(),
+        });
+    }
+</script>
+
+</body>
+</html>

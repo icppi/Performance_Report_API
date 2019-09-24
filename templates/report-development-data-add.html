@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+<head>
+    <meta charset="UTF-8">
+    <title>业务报表系统 - 添加新增数据</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    {# <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>#}
+    <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0,minimum-scale=0.4,maximum-scale=3.0"/>
+    <link rel="stylesheet" href="../../static/css/font.css">
+    <link rel="stylesheet" href="../../static/css/xadmin.css">
+    <script src="../../static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../../static/js/xadmin.js"></script>
+    <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>花名</label>
+                <div class="layui-input-inline layui-show-xs-block">
+                    <select id="username" name="username" lay-verify="" lay-search>
+                        <option disabled>花名</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="new-addition" class="layui-form-label">
+                    开发量</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="new-addition" name="new-addition" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="new-customer" class="layui-form-label">
+                    新客数</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="new-customer" name="new-customer" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="successful-opening" class="layui-form-label">
+                    成功开场</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="successful-opening" name="successful-opening" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="business-introduction" class="layui-form-label">
+                    业务介绍</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="business-introduction" name="business-introduction" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="answer-questions" class="layui-form-label">
+                    解答问题</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="answer-questions" name="answer-questions" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="contract-payment" class="layui-form-label">
+                    约定付款</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="contract-payment" name="contract-payment" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+
+            <div class="layui-form-item">
+                <label for="quality-error" class="layui-form-label">
+                    质检差错数</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="quality-error" name="quality-error" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="data-date" class="layui-form-label">
+                    <span class="x-red">*</span>数据日期</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" placeholder="数据日期" name="data-date" id="data-date">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <button class="layui-btn" lay-filter="add" id="add" onclick="add();return false;">添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'layer', 'laydate'],
+        function () {
+            $ = layui.jquery;
+            var form = layui.form, layer = layui.layer;
+            var laydate = layui.laydate;
+            var date = new Date();
+            laydate.render({
+                elem: '#data-date',
+                isInitValue: true,
+                value: date
+            });
+            layui.form.render();
+            loadSearchData();
+
+            form.verify({
+                numberOrEmpty: function (value, item) {
+                    if (value !== '') {
+                        if (!/^\d+$/.test(value)) {
+                            return '只能填写数字或者不填';
+                        }
+                    }
+                }
+            });
+        });
+
+    function loadSearchData() {
+        $.ajax({
+            url: '/api/person-group-name-data/',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                console.log(data.data);
+                if (data.code === 0) {
+                    console.log(data);
+                    $.each(data.data.person, function (index) {
+                        console.log(data.data.person[index]);
+                        var option = "<option value=\"" + data.data.person[index].id + "\">" + data.data.person[index].name + "</option>";
+                        $("select[id=username]").append(option);
+                    });
+                    layui.form.render();
+                } else {
+                    layer.msg(data.msg, {icon: 2, time: 1000});
+                }
+            },
+            error: function (error) {
+                layer.alert(error.msg, {icon: 2, time: 1000});
+            }
+        });
+    }
+
+    function add() {
+        console.log($('#username').val());
+        console.log($('#new-addition').val());
+        console.log($('#new-customer').val());
+        console.log($('#successful-opening').val());
+        console.log($('#business-introduction').val());
+        console.log($('#answer-questions').val());
+        console.log($('#contract-payment').val());
+        console.log($('#quality-error').val());
+        console.log($('#data-date').val());
+        $.ajax({
+            url: '/api/development-data/',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                'operating': 'add',
+                'person_id': $('#username').val(),
+                'new_volume': $('#new-addition').val(),
+                'new_customer_volume': $('#new-customer').val(),
+                'success_opening_volume': $('#successful-opening').val(),
+                'business_introduction_volume': $('#business-introduction').val(),
+                'answer_question_volume': $('#answer-questions').val(),
+                'contract_pay_volume': $('#contract-payment').val(),
+                'quality_error_volume': $('#quality-error').val(),
+                'data_time': $('#data-date').val(),
+            },
+            error: function (error) {
+                layer.alert('网络连接错误', {icon: 2, time: 1000});
+            },
+            success: function (data) {
+                if (data.code === 0) {
+                    layer.msg(data.msg, {icon: 6, time: 1000},
+                        function () {
+                            console.log('{{ search }}');
+                            xadmin.close();
+                            parent.layui.table.reload('development-data', {
+                                url: '/api/development-data/?person_id={{ search.person_id }}&group_id={{ search.group_id }}&date_range={{ search.date_range }}',
+                            });
+                            //xadmin.father_reload();
+                        });
+                } else {
+                    layer.msg(data.msg, {icon: 2, time: 1000});
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

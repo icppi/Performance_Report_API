@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+<head>
+    <meta charset="UTF-8">
+    <title>业务报表系统 - 添加绩效数据</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    {# <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>#}
+    <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0,minimum-scale=0.4,maximum-scale=3.0"/>
+    <link rel="stylesheet" href="../../static/css/font.css">
+    <link rel="stylesheet" href="../../static/css/xadmin.css">
+    <script src="../../static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../../static/js/xadmin.js"></script>
+    <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>花名</label>
+                <div class="layui-input-inline layui-show-xs-block">
+                    <select id="username" name="username" lay-verify="" lay-search>
+                        <option disabled>花名</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="new-addition-volume" class="layui-form-label">
+                    新加量</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="new-addition-volume" name="new-addition-volume" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="talkable-volume" class="layui-form-label">
+                    可聊量</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="talkable-volume" name="talkable-volume" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="work-customer-volume" class="layui-form-label">
+                    Work客户量</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="work-customer-volume" name="work-customer-volume" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="transaction-volume" class="layui-form-label">
+                    成交量</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="transaction-volume" name="transaction-volume" class="layui-input" lay-verify="numberOrEmpty"></div>
+            </div>
+            <div class="layui-form-item">
+                <label for="data-date" class="layui-form-label">
+                    <span class="x-red">*</span>数据日期</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" placeholder="数据日期" name="data-date" id="data-date">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"></label>
+                <button class="layui-btn" lay-filter="add" id="add" onclick="add();return false;">添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'layer', 'laydate'],
+        function () {
+            $ = layui.jquery;
+            var form = layui.form, layer = layui.layer;
+            var laydate = layui.laydate;
+            var date = new Date();
+            laydate.render({
+                elem: '#data-date',
+                isInitValue: true,
+                value: date
+            });
+            layui.form.render();
+            loadSearchData();
+
+            form.verify({
+                numberOrEmpty: function (value, item) {
+                    if (value !== '') {
+                        if (!/^\d+$/.test(value)) {
+                            return '只能填写数字或者不填';
+                        }
+                    }
+                }
+            });
+        });
+
+    function loadSearchData() {
+        $.ajax({
+            url: '/api/person-group-name-data/',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                console.log(data.data);
+                if (data.code === 0) {
+                    console.log(data);
+                    $.each(data.data.person, function (index) {
+                        console.log(data.data.person[index]);
+                        var option = "<option value=\"" + data.data.person[index].id + "\">" + data.data.person[index].name + "</option>";
+                        $("select[id=username]").append(option);
+                    });
+                    layui.form.render();
+                } else {
+                    layer.msg(data.msg, {icon: 2, time: 1000});
+                }
+            },
+            error: function (error) {
+                layer.alert(error.msg, {icon: 2, time: 1000});
+            }
+        });
+    }
+
+    function add() {
+        console.log($('#username').val());
+        console.log($('#new-addition-volume').val());
+        console.log($('#talkable-volume').val());
+        console.log($('#work-customer-volume').val());
+        console.log($('#transaction-volume').val());
+        console.log($('#data-date').val());
+        $.ajax({
+            url: '/api/performance-data/',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                'operating': 'add',
+                'person_id': $('#username').val(),
+                'new_addition_volume': $('#new-addition-volume').val(),
+                'talkable_volume': $('#talkable-volume').val(),
+                'work_customer_volume': $('#work-customer-volume').val(),
+                'transaction_volume': $('#transaction-volume').val(),
+                'data_time': $('#data-date').val(),
+            },
+            error: function (error) {
+                layer.alert('网络连接错误', {icon: 2, time: 1000});
+            },
+            success: function (data) {
+                if (data.code === 0) {
+                    layer.msg(data.msg, {icon: 6, time: 1000},
+                        function () {
+                            console.log('{{ search }}');
+                            xadmin.close();
+                            parent.layui.table.reload('performance-data', {
+                                url: '/api/performance-data/?person_id={{ search.person_id }}&group_id={{ search.group_id }}&date_range={{ search.date_range }}',
+                            });
+                            //xadmin.father_reload();
+                        });
+                } else {
+                    layer.msg(data.msg, {icon: 2, time: 1000});
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>
