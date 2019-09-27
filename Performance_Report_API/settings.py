@@ -24,7 +24,7 @@ SECRET_KEY = 'k@ctnaj3y^u&8-i3keuym_%z$vn$pq1g6$*4$@)$dqgjsdomug'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', ]
 
 # Application definition
 
@@ -125,6 +125,7 @@ USE_TZ = True
 
 DATE_FORMAT = 'Y-m-d'
 DATETIME_FORMAT = 'Y-m-d H:i:s'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 

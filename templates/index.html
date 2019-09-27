@@ -37,7 +37,7 @@
             <dl class="layui-nav-child">
                 <!-- 二级菜单 -->
                 <dd><a href="/login/">切换账号</a></dd>
-                <dd><a href="/api/user-logout/">退出</a></dd>
+                <dd><a href="/api/user-logout/" onclick="">退出</a></dd>
             </dl>
         </li>
     </ul>
@@ -92,52 +92,23 @@
 
             <li>
                 <a href="javascript:;">
-                    <i class="iconfont left-nav-li" lay-tips="系统统计">&#xe6ce;</i>
+                    <i class="iconfont left-nav-li" lay-tips="报表统计">&#xe6ce;</i>
                     <cite>报表统计</cite>
                     <i class="iconfont nav_right">&#xe697;</i></a>
                 <ul class="sub-menu">
                     <li>
-                        <a onclick="xadmin.add_tab('日数据统计','/report-day-count')">
+                        <a onclick="xadmin.add_tab('数据统计','/statistical-rate/')">
                             <i class="iconfont">&#xe6a7;</i>
-                            <cite>日数据统计</cite></a>
+                            <cite>数据统计</cite></a>
                     </li>
-                    {#                    <li>#}
-                    {#                        <a onclick="xadmin.add_tab('拆线图','echarts2.html')">#}
-                    {#                            <i class="iconfont">&#xe6a7;</i>#}
-                    {#                            <cite>拆线图</cite></a>#}
-                    {#                    </li>#}
-                    {#                    <li>#}
-                    {#                        <a onclick="xadmin.add_tab('地图','echarts3.html')">#}
-                    {#                            <i class="iconfont">&#xe6a7;</i>#}
-                    {#                            <cite>地图</cite></a>#}
-                    {#                    </li>#}
-                    {#                    <li>#}
-                    {#                        <a onclick="xadmin.add_tab('饼图','echarts4.html')">#}
-                    {#                            <i class="iconfont">&#xe6a7;</i>#}
-                    {#                            <cite>饼图</cite></a>#}
-                    {#                    </li>#}
-                    {#                    <li>#}
-                    {#                        <a onclick="xadmin.add_tab('雷达图','echarts5.html')">#}
-                    {#                            <i class="iconfont">&#xe6a7;</i>#}
-                    {#                            <cite>雷达图</cite></a>#}
-                    {#                    </li>#}
-                    {#                    <li>#}
-                    {#                        <a onclick="xadmin.add_tab('k线图','echarts6.html')">#}
-                    {#                            <i class="iconfont">&#xe6a7;</i>#}
-                    {#                            <cite>k线图</cite></a>#}
-                    {#                    </li>#}
-                    {#                    <li>#}
-                    {#                        <a onclick="xadmin.add_tab('热力图','echarts7.html')">#}
-                    {#                            <i class="iconfont">&#xe6a7;</i>#}
-                    {#                            <cite>热力图</cite></a>#}
-                    {#                    </li>#}
-                    {#                    <li>#}
-                    {#                        <a onclick="xadmin.add_tab('仪表图','echarts8.html')">#}
-                    {#                            <i class="iconfont">&#xe6a7;</i>#}
-                    {#                            <cite>仪表图</cite></a>#}
-                    {#                    </li>#}
+                    <li>
+                        <a onclick="xadmin.add_tab('趋势图','/statistical-echarts/')">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>趋势图</cite></a>
+                    </li>
                 </ul>
             </li>
+
         </ul>
     </div>
 </div>
@@ -168,6 +139,26 @@
 </div>
 <div class="page-content-bg"></div>
 <style id="theme_style"></style>
+<script>
+    function logout() {
+        $.ajax({
+            url: '/api/user-logout/',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                if (data.code === 0) {
+                    layer.msg(data.msg, {icon: 1, time: 1000});
+                    window.location.href = '/login/'
+                } else {
+                    layer.msg(data.msg, {icon: 2, time: 1000});
+                }
+            },
+            error: function (error) {
+                layer.alert('网络连接错误', {icon: 2, time: 1000});
+            }
+        });
+    }
+</script>
 <!-- 右侧主体结束 -->
 <!-- 中部结束 -->
 </body>

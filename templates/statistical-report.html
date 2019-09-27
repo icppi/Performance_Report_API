@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+<head>
+    <meta charset="UTF-8">
+    <title>业务报表系统 - 数据统计</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    {# <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>#}
+    <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0,minimum-scale=0.4,maximum-scale=3.0"/>
+    <link rel="stylesheet" href="../static/css/font.css">
+    <link rel="stylesheet" href="../static/css/xadmin.css">
+    <link rel="stylesheet" href="../static/css/formSelects-v4.css">
+    <script src="../static/lib/layui/layui.js" charset="utf-8"></script>
+    <script src="../static/js/formSelects-v4.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../static/js/xadmin.js"></script>
+
+    <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+<body>
+<div class="x-nav">
+          <span class="layui-breadcrumb">
+            <a href="/index/">首页</a><a><cite>数据统计</cite></a>
+          </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <div class="layui-form layui-col-space5">
+                        <div class="layui-inline layui-show-xs-block layui-col-md1">
+                            <select name="data-source" id="data-source" style="height: 36px;">
+                                <option disabled>数据源</option>
+                                <option value="development" selected>新增数据</option>
+                                <option value="return">回访数据</option>
+                            </select>
+                        </div>
+
+                        <div class="layui-inline layui-show-xs-block layui-col-md2">
+                            <input class="layui-input" placeholder="日期范围" name="date-range" id="date-range" style="height: 36px;">
+                        </div>
+
+                        <div class="layui-inline layui-show-xs-block layui-col-md3">
+                            <select name="group-name" id="group-name" xm-select-height="30px" xm-select="group-name" xm-select-show-count="4" xm-select-search="" xm-select-search-type="dl">
+                                <option value="">组别</option>
+                            </select>
+                        </div>
+
+                        <div class="layui-inline layui-show-xs-block layui-col-md3">
+                            <select id="username" name="username" xm-select-height="30px" xm-select="username" xm-select-show-count="4" xm-select-search="" xm-select-search-type="dl">
+                                <option value="">花名</option>
+                            </select>
+                        </div>
+
+                        <div class="layui-inline layui-show-xs-block">
+                            <button id="search" class="layui-btn" lay-filter="search" onclick="search_btn();return false;"><i class="layui-icon">&#xe615;</i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-card-body ">
+                    <table class="layui-hide" id="statistical-rate" lay-filter="statistical-rate"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var obj_value = 'group';
+    var id_value = '';
+    layui.use(['form', 'laydate', 'table'], function () {
+        var $ = layui.jquery;
+        var table = layui.table;
+        var laydate = layui.laydate;
+        var form = layui.form;
+        var formSelects = layui.formSelects;
+        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#date-range').val();
+
+        loadSearchData(); //加载搜索栏数据
+        layui.form.render();
+        $('.layui-unselect')[1].style.height = '36px';
+        laydate.render({
+            elem: '#date-range', range: true
+        });
+        table.render({
+            elem: '#statistical-rate',
+            url: '/api/statistical-rate-data/' + parameter,
+            toolbar: '#tool-top',
+            defaultToolbar: [
+                'filter', 'exports', 'print', {
+                    title: '提示',
+                    layEvent: 'LAYTABLE_TIPS',
+                    icon: 'layui-icon-tips'
+                }
+            ],
+            cellMinWidth: 80,
+            height: 'full-200',
+            title: '新增数据统计',
+            cols: [[
+                {field: 'date', title: '日期', width: 200, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                {field: 'name', title: '组/花名', width: 120, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                {field: 'new_volume', title: '开发量', align: 'center', width: 140, sort: true},
+                {field: 'new_customer_volume', title: '新客数', sort: true, align: 'center', width: 140},
+                {field: 'success_opening_rate', title: '成功开场率', align: 'center', width: 140, sort: true},
+                {field: 'business_introduction_rate', title: '业务介绍成功率', sort: true, align: 'center', width: 140},
+                {field: 'answer_question_rate', title: '解答问题率', sort: true, align: 'center', width: 140},
+                {field: 'contract_pay_rate', title: '约定付款率', sort: true, align: 'center', width: 140},
+                {field: 'transaction_rate', title: '成交率', sort: true, align: 'center', width: 140},
+                {field: 'per_data_sum', title: '成交量', sort: true, align: 'center', width: 140},
+            ]],
+            page: true,
+            limit: 20,
+            parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data
+                };
+            }
+        });
+
+        //头工具栏事件
+        table.on('toolbar(statistical-rate)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            var data = checkStatus.data;
+            switch (obj.event) {
+                case 'LAYTABLE_TIPS':
+                    layer.alert('保留功能');
+                    break;
+            }
+        });
+
+        layui.formSelects.opened('username', function (id) {
+            obj_value = 'person';
+        });
+        layui.formSelects.opened('group-name', function (id) {
+            obj_value = 'group';
+        });
+
+        layui.formSelects.closed('username', function (id) {
+            id_value = layui.formSelects.value('username', 'val');
+        });
+        layui.formSelects.closed('group-name', function (id) {
+            id_value = layui.formSelects.value('group-name', 'val');
+        });
+
+        function loadSearchData() {
+            $.ajax({
+                url: '/api/person-group-name-data/',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.code === 0) {
+                        console.log(data);
+                        $.each(data.data.group, function (index) {
+                            console.log(data.data.group[index]);
+                            var option = "<option value=\"" + data.data.group[index].id + "\">" + data.data.group[index].name + "</option>";
+                            $("select[id=group-name]").append(option);
+                        });
+                        $.each(data.data.person, function (index) {
+                            console.log(data.data.person[index]);
+                            var option = "<option value=\"" + data.data.person[index].id + "\">" + data.data.person[index].name + "</option>";
+                            $("select[id=username]").append(option);
+                        });
+                        layui.formSelects.render('username');
+                        layui.formSelects.render('group-name');
+                    } else {
+                        layer.msg(data.msg, {icon: 2, time: 1000});
+                    }
+                },
+                error: function (error) {
+                    layer.alert(error.msg, {icon: 2, time: 1000});
+                }
+            });
+        }
+    });
+
+    function search_btn() {
+        console.log('数据源：' + $('#data-source').val());
+        console.log('日期选择：' + $('#date-range').val());
+        console.log('组别：' + $('#group-name').val());
+        console.log('花名：' + $('#username').val());
+        console.log(layui.formSelects.value('username', 'val'));
+        console.log(layui.formSelects.value('group-name', 'val'));
+        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#date-range').val();
+        if ($('#data-source').val() === 'development') {
+            layui.table.reload('statistical-rate', {
+                url: '/api/statistical-rate-data/' + parameter,
+                cols: [[
+                    {field: 'date', title: '日期', width: 200, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                    {field: 'name', title: '组/花名', width: 120, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                    {field: 'new_volume', title: '开发量', align: 'center', width: 140, sort: true},
+                    {field: 'new_customer_volume', title: '新客数', sort: true, align: 'center', width: 140},
+                    {field: 'success_opening_rate', title: '成功开场率', align: 'center', width: 140, sort: true},
+                    {field: 'business_introduction_rate', title: '业务介绍成功率', sort: true, align: 'center', width: 140},
+                    {field: 'answer_question_rate', title: '解答问题率', sort: true, align: 'center', width: 140},
+                    {field: 'contract_pay_rate', title: '约定付款率', sort: true, align: 'center', width: 140},
+                    {field: 'transaction_rate', title: '成交率', sort: true, align: 'center', width: 140},
+                    {field: 'per_data_sum', title: '成交量', sort: true, align: 'center', width: 140},
+                ]],
+            });
+        } else {
+
+            layui.table.render({
+                elem: '#statistical-rate',
+                url: '/api/statistical-rate-data/' + parameter,
+                toolbar: '#tool-top',
+                defaultToolbar: [
+                    'filter', 'exports', 'print', {
+                        title: '提示',
+                        layEvent: 'LAYTABLE_TIPS',
+                        icon: 'layui-icon-tips'
+                    }
+                ],
+                cellMinWidth: 80,
+                height: 'full-200',
+                title: '回访数据统计',
+                cols: [[
+                    {field: 'date', title: '日期', width: 200, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                    {field: 'name', title: '组/花名', width: 120, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                    {field: 'return_visit_volume', title: '回访量', align: 'center', width: 140, sort: true},
+                    {field: 'success_opening_rate', title: '成功开场率', align: 'center', width: 140, sort: true},
+                    {field: 'business_introduction_rate', title: '业务介绍成功率', sort: true, align: 'center', width: 140},
+                    {field: 'answer_question_rate', title: '解答问题率', sort: true, align: 'center', width: 140},
+                    {field: 'contract_pay_rate', title: '约定付款率', sort: true, align: 'center', width: 140},
+                    {field: 'transaction_rate', title: '成交率', sort: true, align: 'center', width: 140},
+                    {field: 'per_data_sum', title: '成交量', sort: true, align: 'center', width: 140}
+                ]],
+                page: true,
+                limit: 20,
+                parseData: function (res) {
+                    return {
+                        "code": res.code,
+                        "msg": res.msg,
+                        "count": res.count,
+                        "data": res.data
+                    };
+                }
+            });
+        }
+
+    }
+
+</script>
+</body>
+</html>

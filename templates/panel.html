@@ -24,14 +24,14 @@
             <div class="layui-card">
                 <div class="layui-card-body ">
                     <blockquote class="layui-elem-quote">欢迎管理员：
-                        <span class="x-red">{% if user.username == '' %}未登录{% else %}{{ user.username|upper }}{% endif %}</span> ！当前时间 : {{ time }}
+                        <span class="x-red">{% if user.username == '' %}未登录{% else %}{{ user.username|upper }}{% endif %}</span> ！ 当前时间 : <span id="time"></span>
                     </blockquote>
                 </div>
             </div>
         </div>
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">数据统计</div>
+                <div class="layui-card-header">系统数据</div>
                 <div class="layui-card-body ">
                     <ul class="layui-row layui-col-space10 layui-this x-admin-carousel x-admin-backlog">
                         <li class="layui-col-md2 layui-col-xs6">
@@ -48,29 +48,140 @@
                         </li>
                         <li class="layui-col-md2 layui-col-xs6">
                             <a href="javascript:;" class="x-admin-backlog-body">
-                                <h3>待定</h3>
-                                <p><cite>99</cite></p>
+                                <h3>新增数据</h3>
+                                <p><cite id="development-count"></cite></p>
                             </a>
                         </li>
                         <li class="layui-col-md2 layui-col-xs6">
                             <a href="javascript:;" class="x-admin-backlog-body">
-                                <h3>待定</h3>
-                                <p><cite>67</cite></p>
+                                <h3>回访数据</h3>
+                                <p><cite id="return-count"></cite></p>
                             </a>
                         </li>
                         <li class="layui-col-md2 layui-col-xs6">
                             <a href="javascript:;" class="x-admin-backlog-body">
-                                <h3>待定</h3>
-                                <p><cite>67</cite></p>
+                                <h3>绩效数据</h3>
+                                <p><cite id="performance-count"></cite></p>
                             </a>
                         </li>
-                        <li class="layui-col-md2 layui-col-xs6 ">
-                            <a href="javascript:;" class="x-admin-backlog-body">
-                                <h3>待定</h3>
-                                <p><cite>6766</cite></p>
-                            </a>
-                        </li>
+
                     </ul>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">昨日数据</div>
+                <div class="layui-card-body ">
+                    <ul class="layui-row layui-col-space10 layui-this x-admin-carousel x-admin-backlog">
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>新加数</h3>
+                                <p><cite id="new_value_day"></cite></p>
+                            </a>
+                        </li>
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>回访数</h3>
+                                <p><cite id="return_value_day"></cite></p>
+                            </a>
+                        </li>
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>约定付款数</h3>
+                                <p><cite id="pay_value_day"></cite></p>
+                            </a>
+                        </li>
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>成交数</h3>
+                                <p><cite id="transaction_value_day"></cite></p>
+                            </a>
+                        </li>
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>业务介绍成功率</h3>
+                                <p><cite id="yesterday_development_business_introduction_rate_day"></cite></p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">大盘总数据</div>
+                <div class="layui-card">
+                    <div class="layui-card-header">新增数据</div>
+                    <div class="layui-card-body ">
+                        <ul class="layui-row layui-col-space10 layui-this x-admin-carousel x-admin-backlog">
+                            <li class="layui-col-md2 layui-col-xs6">
+                                <a href="javascript:;" class="x-admin-backlog-body">
+                                    <h3>新加数</h3>
+                                    <p><cite id="development_new_volume_all"></cite></p>
+                                </a>
+                            </li>
+                            <li class="layui-col-md2 layui-col-xs6">
+                                <a href="javascript:;" class="x-admin-backlog-body">
+                                    <h3>新客数</h3>
+                                    <p><cite id="development_new_customer_volume_all"></cite></p>
+                                </a>
+                            </li>
+                            <li class="layui-col-md2 layui-col-xs6">
+                                <a href="javascript:;" class="x-admin-backlog-body">
+                                    <h3>约定付款数</h3>
+                                    <p><cite id="development_pay_volume_all"></cite></p>
+                                </a>
+                            </li>
+                            <li class="layui-col-md2 layui-col-xs6">
+                                <a href="javascript:;" class="x-admin-backlog-body">
+                                    <h3>成交数</h3>
+                                    <p><cite id="development_transaction_volume_all"></cite></p>
+                                </a>
+                            </li>
+                            <li class="layui-col-md2 layui-col-xs6">
+                                <a href="javascript:;" class="x-admin-backlog-body">
+                                    <h3>业务介绍成功率</h3>
+                                    <p><cite id="development_business_introduction_rate_all"></cite></p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="layui-card">
+                    <div class="layui-card-header">回访数据</div>
+                    <div class="layui-card-body ">
+                        <ul class="layui-row layui-col-space10 layui-this x-admin-carousel x-admin-backlog">
+                            <li class="layui-col-md2 layui-col-xs6">
+                                <a href="javascript:;" class="x-admin-backlog-body">
+                                    <h3>回访数</h3>
+                                    <p><cite id="return_return_volume_all"></cite></p>
+                                </a>
+                            </li>
+                            <li class="layui-col-md2 layui-col-xs6">
+                                <a href="javascript:;" class="x-admin-backlog-body">
+                                    <h3>约定付款数</h3>
+                                    <p><cite id="return_pay_volume_all"></cite></p>
+                                </a>
+                            </li>
+                            <li class="layui-col-md2 layui-col-xs6">
+                                <a href="javascript:;" class="x-admin-backlog-body">
+                                    <h3>成交数</h3>
+                                    <p><cite id="return_transaction_volume_all"></cite></p>
+                                </a>
+                            </li>
+                            <li class="layui-col-md2 layui-col-xs6">
+                                <a href="javascript:;" class="x-admin-backlog-body">
+                                    <h3>业务介绍成功率</h3>
+                                    <p><cite id="return_business_introduction_rate_all"></cite></p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -120,8 +231,31 @@
             success: function (data) {
                 if (data.code === 0) {
                     console.log(data);
-                    $('#person-count').html(data.data.person_count);
-                    $('#group-count').html(data.data.group_count);
+                    $('#time').html(data.data.sys.time);
+                    $('#person-count').html(data.data.sys.person_count);
+                    $('#group-count').html(data.data.sys.group_count);
+                    $('#development-count').html(data.data.sys.development_count);
+                    $('#return-count').html(data.data.sys.return_count);
+                    $('#performance-count').html(data.data.sys.performance_count);
+
+                    $('#new_value_day').html(data.data.panel.yesterday_development_new_volume);
+                    $('#return_value_day').html(data.data.panel.yesterday_return_return_volume);
+                    $('#pay_value_day').html(data.data.panel.yesterday_development_contract_pay_volume);
+                    $('#transaction_value_day').html(data.data.panel.yesterday_performance_transaction_volume);
+                    $('#yesterday_development_business_introduction_rate_day').html(data.data.panel.yesterday_development_business_introduction_rate_day);
+
+                    $('#development_new_customer_volume_all').html(data.data.panel.development_new_customer_volume_all);
+                    $('#development_pay_volume_all').html(data.data.panel.development_pay_volume_all);
+                    $('#development_transaction_volume_all').html(data.data.panel.development_transaction_volume_all);
+                    $('#development_new_volume_all').html(data.data.panel.development_new_volume_all);
+                    $('#development_business_introduction_rate_all').html(data.data.panel.development_business_introduction_rate_all);
+
+                    $('#return_transaction_volume_all').html(data.data.panel.development_transaction_volume_all);
+
+                    $('#return_pay_volume_all').html(data.data.panel.return_contract_pay_volume_all);
+                    $('#return_return_volume_all').html(data.data.panel.return_return_visit_volume_all);
+                    $('#return_business_introduction_rate_all').html(data.data.panel.return_business_introduction_rate_all);
+
                 } else {
                     layer.msg(data.msg, {icon: 2, time: 1000});
                 }

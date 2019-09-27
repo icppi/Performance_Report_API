@@ -100,16 +100,17 @@
             cellMinWidth: 80,
             height: 'full-200',
             title: '用户数据表',
+            totalRow: true, //开启合计行
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
                 {field: 'data_time', title: '数据日期', width: 120, fixed: 'left', unresize: true, sort: true, align: 'center'},
-                {field: 'id', title: 'ID', width: 80, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                {field: 'id', title: 'ID', width: 80, fixed: 'left', unresize: true, sort: true, align: 'center',totalRowText: '合计：'},
                 {field: 'person_name', title: '用户名', align: 'center', width: 120, sort: true},
                 {field: 'group_name', title: '组别', align: 'center', width: 100, sort: true},
-                {field: 'new_addition_volume', title: '新加量', sort: true, align: 'center', width: 100},
-                {field: 'talkable_volume', title: '可聊量', align: 'center', width: 100, sort: true},
-                {field: 'work_customer_volume', title: 'Work客户量', sort: true, align: 'center', width: 120},
-                {field: 'transaction_volume', title: '成交量', sort: true, align: 'center', width: 100},
+                {field: 'new_addition_volume', title: '新加量', sort: true, align: 'center', width: 100,totalRow: true},
+                {field: 'talkable_volume', title: '可聊量', align: 'center', width: 100, sort: true,totalRow: true},
+                {field: 'work_customer_volume', title: 'Work客户量', sort: true, align: 'center', width: 120,totalRow: true},
+                {field: 'transaction_volume', title: '成交量', sort: true, align: 'center', width: 100,totalRow: true},
                 {fixed: 'right', title: '操作', toolbar: '#tool-right', width: 150, align: 'center'}
             ]],
             page: true,
