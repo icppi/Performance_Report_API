@@ -1516,7 +1516,240 @@ def data_conversion_rate(request):
 
 def statistical_echarts_view(request):
     if request.user.is_authenticated:
-
-        return render(request, 'statistical-echarts.html')
+        if request.method == 'GET':
+            return render(request, 'statistical-echarts.html')
     else:
         return render(request, 'login.html')
+
+
+# 默认只选日期 显示各组的数据
+def statistical_echarts_data(request):
+    if request.method == 'GET':
+        id = request.GET.get('id')
+        obj = request.GET.get('obj')
+        date_range = request.GET.get('date-range')
+
+        if id is not None and id != '' and id != 'undefined' and id != '[]':
+            id_list = str(id)[1:-1].split(',')
+        else:
+            if obj == 'group':
+                id_list = [group.id for group in GroupModel.objects.all()]
+            else:
+                id_list = [person.id for person in PersonModel.objects.all()]
+
+        if obj is not None and obj != '' and obj != 'undefined':
+            if obj == 'group':
+                id_data = GroupModel.objects.filter(id__in=id_list)
+                name = [item.group_name for item in id_data]
+            if obj == 'person':
+                id_data = PersonModel.objects.filter(id__in=id_list)
+                name = [item.username for item in id_data]
+
+        if date_range is not None and date_range != '' and date_range != 'undefined':
+            start = str(date_range).split(' - ')[0]
+            end = str(date_range).split(' - ')[1]
+            if start is not None and start != '' and end is not None and end != '':
+                date_list = utils.getEveryDay(start, end)
+                if obj == 'person':
+                    person_sum_list = []
+                    return_sum_data = []
+                    for index in id_list:
+                        person_sum = []
+                        return_sum_list = []
+                        for item_date in date_list:
+                            development_data = DevelopmentDataModel.objects.filter(data_time=item_date)
+                            return_data = ReturnDataModel.objects.filter(data_time=item_date)
+                            person_sum.append(int(np.sum([int(item.new_customer_volume) for item in development_data.filter(person_id=index)], axis=0)))
+                            return_sum_list.append(int(np.sum([int(item.return_visit_volume) for item in return_data.filter(person_id=index)], axis=0)))
+                        person_sum_list.append(person_sum)
+                        return_sum_data.append(return_sum_list)
+                    print(return_sum_data)
+                    ret1 = [{'name': name[index],
+                             'data': item,
+                             'type': 'line',
+                             'stack': '总量',
+                             'label': {
+                                 'normal': {
+                                     'show': 'true',
+                                     'position': 'top'
+                                 }
+                             }, } for index, item in enumerate(person_sum_list)]
+                    ret2 = [{'name': name[index],
+                             'data': item,
+                             'type': 'line',
+                             'stack': '总量',
+                             'label': {
+                                 'normal': {
+                                     'show': 'true',
+                                     'position': 'top'
+                                 }
+                             }, } for index, item in enumerate(return_sum_data)]
+                    ret_data1 = {
+                        'legend': name,
+                        'xAxis_data': date_list,
+                        'series': ret1
+                    }
+                    ret_data2 = {
+                        'legend': name,
+                        'xAxis_data': date_list,
+                        'series': ret2
+                    }
+                    print(ret_data1)
+                    print(ret_data2)
+                    return JsonResponse(status=status.HTTP_200_OK, data={'code': 0, 'msg': 'success', 'data': {'new': ret_data1, 'return': ret_data2}})
+
+                if obj == 'group':
+                    sum_data = []
+                    return_sum_data = []
+                    for index in id_list:
+                        sum_list = []
+                        return_sum_list = []
+                        for item_date in date_list:
+                            return_data = ReturnDataModel.objects.filter(data_time=item_date)
+                            development_data = DevelopmentDataModel.objects.filter(data_time=item_date)
+                            person = PersonModel.objects.filter(group_id=index)
+                            sum_list.append(int(np.sum([int(item.new_customer_volume) for item in development_data.filter(person_id__in=person)], axis=0)))
+                            return_sum_list.append(int(np.sum([int(item.return_visit_volume) for item in return_data.filter(person_id__in=person)], axis=0)))
+                        sum_data.append(sum_list)
+                        return_sum_data.append(return_sum_list)
+                    print(return_sum_data)
+                    ret1 = [{'name': name[index],
+                             'data': item,
+                             'type': 'line',
+                             'stack': '总量',
+                             'label': {
+                                 'normal': {
+                                     'show': 'true',
+                                     'position': 'top'
+                                 }
+                             }, } for index, item in enumerate(sum_data)]
+                    ret2 = [{'name': name[index],
+                             'data': item,
+                             'type': 'line',
+                             'stack': '总量',
+                             'label': {
+                                 'normal': {
+                                     'show': 'true',
+                                     'position': 'top'
+                                 }
+                             }, } for index, item in enumerate(return_sum_data)]
+                    ret_data1 = {
+                        'legend': name,
+                        'xAxis_data': date_list,
+                        'series': ret1
+                    }
+                    ret_data2 = {
+                        'legend': name,
+                        'xAxis_data': date_list,
+                        'series': ret2
+                    }
+                    print(ret_data1)
+                    print(ret_data2)
+                    return JsonResponse(status=status.HTTP_200_OK, data={'code': 0, 'msg': 'success', 'data': {'new': ret_data1, 'return': ret_data2}})
+
+
+def top_view(request):
+    if request.user.is_authenticated:
+        if request.method == 'GET':
+            return render(request, 'top.html', context={})
+    else:
+        return render(request, 'login.html')
+
+
+def top_data_api(request):
+    date_range = request.GET.get('date-range')
+    num = request.GET.get('num')
+    if not num or num == '' or num == 'undefined':
+        num = 10
+    else:
+        num = int(num)
+
+    person_data = PersonModel.objects.all()
+    development_data = DevelopmentDataModel.objects.all()
+    return_data = ReturnDataModel.objects.all()
+    performance_data = PerformanceDataModel.objects.all()
+    # 过滤时间
+    if date_range is not None and date_range != '' and date_range != 'undefined':
+        start = str(date_range).split(' - ')[0]
+        end = str(date_range).split(' - ')[1]
+        if start is not None and start != '' and end is not None and end != '':
+            start = utils.parse_ymd(start + ' 00:00:00')
+            end = utils.parse_ymd(end + ' 23:59:59')
+            development_data = development_data.filter(data_time__in=(start, end))
+            return_data = return_data.filter(data_time__in=(start, end))
+            performance_data = performance_data.filter(data_time__in=(start, end))
+        else:
+            development_data = development_data.filter(data_time__in=(utils.before_n_day(8), utils.before_n_day(1)))
+            return_data = return_data.filter(data_time__in=(utils.before_n_day(8), utils.before_n_day(1)))
+            performance_data = performance_data.filter(data_time__in=(utils.before_n_day(8), utils.before_n_day(1)))
+
+    return_person_dev_list = []
+    return_person_return_list = []
+    return_person_performance_list = []
+    return_person_rate_list = []
+
+    for person in person_data:
+        ret_person_dev = {}
+        ret_person_return = {}
+        ret_person_performance = {}
+        ret_person_rate = {}
+
+        person_dev_data_list = [int(item.new_customer_volume) for item in development_data.filter(person_id=person) if item.new_customer_volume is not None and item.new_customer_volume != '']
+        person_dev_data = int(np.sum(person_dev_data_list, axis=0))
+
+        person_return_data_list = [int(item.return_visit_volume) for item in return_data.filter(person_id=person) if item.return_visit_volume is not None and item.return_visit_volume != '']
+        person_return_data_data = int(np.sum(person_return_data_list, axis=0))
+
+        person_per_data_list = [int(item.transaction_volume) for item in performance_data.filter(person_id=person) if item.transaction_volume is not None and item.transaction_volume != '']
+        person_per_data = int(np.sum(person_per_data_list, axis=0))
+
+        person_dev_success_opening_data_list = [int(item.success_opening_volume) for item in development_data.filter(person_id=person) if item.success_opening_volume is not None and item.new_customer_volume != '']
+        person_dev_success_opening_data = np.sum(person_dev_success_opening_data_list, axis=0)
+
+        person_dev_business_data_list = [int(item.business_introduction_volume) for item in development_data.filter(person_id=person) if item.business_introduction_volume is not None and item.new_customer_volume != '']
+        person_dev_business_data = np.sum(person_dev_business_data_list, axis=0)
+
+        person_dev_business_rate = round((person_dev_business_data / person_dev_success_opening_data), 2)
+
+        ret_person_rate['person_name'] = ret_person_dev['person_name'] = ret_person_return['person_name'] = ret_person_performance['person_name'] = person.username
+        ret_person_rate['group_name'] = ret_person_dev['group_name'] = ret_person_return['group_name'] = ret_person_performance['group_name'] = person.group_id.group_name
+        ret_person_dev['new_addition'] = person_dev_data
+        ret_person_rate['business_rate'] = person_dev_business_rate
+        ret_person_return['return_value'] = person_return_data_data
+        ret_person_performance['transaction_value'] = person_per_data
+
+        return_person_dev_list.append(ret_person_dev)
+        return_person_rate_list.append(ret_person_rate)
+        return_person_return_list.append(ret_person_return)
+        return_person_performance_list.append(ret_person_performance)
+
+    return_person_dev_list = sorted(return_person_dev_list, key=lambda e: e.__getitem__('new_addition'), reverse=True)
+    return_person_return_list = sorted(return_person_return_list, key=lambda e: e.__getitem__('return_value'), reverse=True)
+    return_person_performance_list = sorted(return_person_performance_list, key=lambda e: e.__getitem__('transaction_value'), reverse=True)
+    return_person_rate_list = sorted(return_person_rate_list, key=lambda e: e.__getitem__('business_rate'), reverse=True)
+
+    for index, item in enumerate(return_person_dev_list):
+        item['ranking'] = int(index) + 1
+
+    for index, item in enumerate(return_person_return_list):
+        item['ranking'] = int(index) + 1
+
+    for index, item in enumerate(return_person_performance_list):
+        item['ranking'] = int(index) + 1
+
+    for index, item in enumerate(return_person_rate_list):
+        item['business_rate'] = str(item['business_rate']) + '%'
+        item['ranking'] = int(index) + 1
+
+    return JsonResponse(status=status.HTTP_200_OK,
+                        data={'code': 0,
+                              'msg': 'success',
+                              'count': 10,
+                              'data':
+                                  {
+                                      'ret_new': return_person_dev_list[:num],
+                                      'ret_return': return_person_return_list[:num],
+                                      'ret_rate': return_person_rate_list[:num],
+                                      'ret_transaction': return_person_performance_list[:num],
+                                  }
+                              })

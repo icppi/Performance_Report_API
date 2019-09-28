@@ -32,9 +32,8 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-body ">
+                <div class="layui-card-body layui-row">
                     <div class="layui-form layui-col-space5">
-
                         <div class="layui-inline layui-show-xs-block layui-col-md2">
                             <input class="layui-input" placeholder="日期范围" name="date-range" id="date-range" style="height: 36px;">
                         </div>
@@ -56,8 +55,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="layui-card-body ">
-                    <div id="echarts" style="width: 100%;height:600px;"></div>
+                <div class="layui-card-body">
+                    <div id="echarts-new-data" style="height:500px;"></div>
+                </div>
+                <div class="layui-card-body">
+                    <div id="echarts-return-data" style="height:500px;"></div>
                 </div>
             </div>
         </div>
@@ -125,16 +127,16 @@
     });
 
 
-    var myChart = echarts.init(document.getElementById('echarts'));
-    option = {
+    var Chart1 = echarts.init(document.getElementById('echarts-new-data'));
+    option1 = {
         title: {
-            text: '趋势图',
+            text: '新加数 - 趋势图',
         },
         tooltip: {
             trigger: 'axis'
         },
         legend: {
-            data: ['新加量', '回访量']
+            data: []
         },
         grid: {
             left: '3%',
@@ -173,47 +175,104 @@
         xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+            data: []
         },
         yAxis: {
             type: 'value',
             minInterval: 10
         },
-        series: [
-            {
-                name: '新加量',
-                type: 'line',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'top'
-                    }
-                },
-                data: [120, 132, 101, 134, 90, 230, 210]
-            },
-            {
-                name: '回访量',
-                type: 'line',
-                stack: '总量',
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'top'
-                    }
-                },
-                data: [220, 182, 191, 234, 290, 330, 310]
-            }
-        ]
     };
-    myChart.setOption(option);
+    Chart1.setOption(option1);
+
+    var Chart2 = echarts.init(document.getElementById('echarts-return-data'));
+    option2 = {
+        title: {
+            text: '回访量 - 趋势图',
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data: []
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        toolbox: {
+            show: true,
+            showTitle: false, // 隐藏默认文字，否则两者位置会重叠
+            feature: {
+                magicType: {
+                    type: ['line', 'bar', 'tiled']
+                },
+                saveAsImage: {
+                    show: true,
+                    title: '保存为图片'
+                },
+                dataView: {
+                    show: true,
+                    title: '数据视图'
+                },
+            },
+            tooltip: { // 和 option.tooltip 的配置项相同
+                show: true,
+                formatter: function (param) {
+                    return '<div>' + param.title + '</div>'; // 自定义的 DOM 结构
+                },
+                backgroundColor: '#222',
+                textStyle: {
+                    fontSize: 12,
+                },
+                extraCssText: 'box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);' // 自定义的 CSS 样式
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: []
+        },
+        yAxis: {
+            type: 'value',
+            minInterval: 10
+        }
+    };
+    Chart2.setOption(option2);
 
     function search_btn() {
-        console.log('日期选择：' + $('#date-range').val());
-        console.log(layui.formSelects.value('username', 'val'));
-        console.log(layui.formSelects.value('group-name', 'val'));
+        if ((layui.formSelects.value('username', 'val') === '' && $('#date-range').val() === '') || $('#date-range').val() === '') {
+            layer.msg('请选择筛选条件', {icon: 2, time: 1000});
+            return false;
+        }
         var parameter = '?obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#date-range').val();
         console.log(parameter);
+        Chart1.showLoading();
+        Chart2.showLoading();
+        $.get('/api/statistical-echarts-data/' + parameter).done(function (data) {
+            Chart1.hideLoading();
+            Chart2.hideLoading();
+            console.log(data.data);
+            Chart1.setOption({
+                legend: {
+                    data: data.data.new.legend
+                },
+                xAxis: {
+                    data: data.data.new.xAxis_data
+                },
+                series: data.data.new.series
+            });
+            Chart2.setOption({
+                legend: {
+                    data: data.data.return.legend
+                },
+                xAxis: {
+                    data: data.data.return.xAxis_data
+                },
+                series: data.data.return.series
+            });
+        });
     }
 </script>
 </body>

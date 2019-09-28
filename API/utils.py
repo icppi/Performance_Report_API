@@ -24,6 +24,14 @@ def parse_ymd(time):
     return data
 
 
+def date_ymd(time):
+    # 2019-09-20
+    # 2019-09-21
+    year, month, day = time.split('-')
+    data = datetime.datetime(int(year), int(month), int(day))
+    return data
+
+
 def today_date():
     return datetime.date.today()
 
@@ -62,3 +70,14 @@ def before_n_day_time_end(n):
     year, month, day = ymd.split('-')
     hour, minute, second = hms.split(':')
     return datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), int(second))
+
+
+def getEveryDay(begin_date, end_date):
+    date_list = []
+    begin_date = datetime.datetime.strptime(begin_date, "%Y-%m-%d")
+    end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+    while begin_date <= end_date:
+        date_str = begin_date.strftime("%Y-%m-%d")
+        date_list.append(date_str)
+        begin_date += datetime.timedelta(days=1)
+    return date_list
