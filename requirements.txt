@@ -1,4 +1,6 @@
-numpy
-django
+Django==2.2.5
 djangorestframework
+numpy
 PyMySQL
+pytz
+sqlparse

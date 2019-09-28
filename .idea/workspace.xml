@@ -2,18 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7cb8bc3e-35cd-4d6d-9511-d068ec720aa7" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/top.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" afterPath="$PROJECT_DIR$/.gitattributes" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Performance_Report_API/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Performance_Report_API/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/statistical-echarts.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/statistical-echarts.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/panel.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/panel.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -73,7 +64,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="E:/Workspace/python-demo/Spider/写真图片/MM多线程.py" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.project" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -210,7 +201,7 @@
       <workItem from="1569377287438" duration="52911000" />
       <workItem from="1569545505902" duration="15072000" />
       <workItem from="1569564959874" duration="2158000" />
-      <workItem from="1569567936325" duration="15857000" />
+      <workItem from="1569567936325" duration="19512000" />
     </task>
     <servers />
   </component>
