@@ -9,8 +9,16 @@
     <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0,minimum-scale=0.4,maximum-scale=3.0"/>
     <link rel="stylesheet" href="../static/css/font.css">
     <link rel="stylesheet" href="../static/css/xadmin.css">
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+
+    <link rel="stylesheet" href="../static/css/daterangepicker.css">
+    <script src="../static/js/jquery.min.js" charset="utf-8"></script>
+
     <script src="../static/lib/layui/layui.js" charset="utf-8"></script>
     <script type="text/javascript" src="../static/js/xadmin.js"></script>
+
+    <script type="text/javascript" src="../static/js/moment.js"></script>
+    <script type="text/javascript" src="../static/js/daterangepicker.js"></script>
     <!--[if lt IE 9]>
           <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
           <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
@@ -33,7 +41,12 @@
                 <div class="layui-card-body ">
                     <div class="layui-form layui-col-space5">
                         <div class="layui-inline layui-show-xs-block">
-                            <input class="layui-input" placeholder="日期范围" name="date-range" id="date-range">
+                            <button type="button" class="layui-btn layui-btn-primary" name="daterange-btn" id="daterange-btn">
+                                <span>
+                                  <i class="icon iconfont icon-calendar1"></i> 日期选择
+                                </span>
+                                <i class="icon iconfont icon-danxian-youjiantou-copy"></i>
+                            </button>
                         </div>
 
                         <div class="layui-inline layui-show-xs-block">
@@ -74,6 +87,39 @@
         var laydate = layui.laydate;
         var form = layui.form;
 
+        $('#daterange-btn span').html(moment().subtract(6, 'days').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
+        $('.ranges_1 ul').remove();
+        $('#daterange-btn').daterangepicker({
+                ranges: {
+                    '今天': [moment(), moment()],
+                    '昨天': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    '前天': [moment().subtract(2, 'days'), moment().subtract(2, 'days')],
+                    '过去7天': [moment().subtract(6, 'days'), moment()],
+                    '过去14天': [moment().subtract(13, 'days'), moment()],
+                    '过去30天': [moment().subtract(29, 'days'), moment()],
+                    '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    '过去90天': [moment().subtract(89, 'days'), moment()],
+                    '过去半年': [moment().subtract(179, 'days'), moment()],
+                    '上周(周日至周六)': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
+                    '上周(周一至周日)': [moment().subtract(1, 'week').startOf('week').subtract(-1, 'days'), moment().subtract(1, 'week').endOf('week').subtract(-1, 'days')],
+                },
+                startDate: moment().subtract(6, 'days'),
+                endDate: moment(),
+            }, function (start, end, label) {
+                console.log(label);
+                if (label == '今天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else if (label == '昨天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else if (label == '前天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                }
+                console.log($('#daterange-btn span').html());
+            }
+        );
+
         loadSearchData(); //加载搜索栏数据
         layui.form.render();
         laydate.render({
@@ -84,7 +130,7 @@
         table.render({
             elem: '#group-data',
             {#url: '/api/group-data/',#}
-            url: '/api/group-data/?id=' + $('#group-name').val() + '&date-range=' + $('#date-range').val(),
+            url: '/api/group-data/?id=' + $('#group-name').val() + '&date-range=' + $('#daterange-btn span').html(),
             toolbar: '#tool-top',
             defaultToolbar: [
                 'filter', 'exports', 'print', {
@@ -127,7 +173,7 @@
                         clickedArr[data[i].id] = i;
                         id.push(data[i].id);
                     }
-                    if(id.length <= 0){
+                    if (id.length <= 0) {
                         layer.msg('请选择要删除的数据', {icon: 2, time: 1000});
                         break;
                     }
@@ -247,7 +293,7 @@
                     if (data.code === 0) {
                         layer.msg(data.msg, {icon: 1, time: 1000});
                         layui.table.reload('group-data', {
-                            url: '/api/group-data/?id=' + $('#group-name').val() + '&date-range=' + $('#date-range').val(),
+                            url: '/api/group-data/?id=' + $('#group-name').val() + '&date-range=' + $('#daterange-btn span').html(),
                         });
                         layui.form.render();
                     } else {
@@ -287,10 +333,10 @@
     }
 
     function search() {
-        console.log('日期选择：' + $('#date-range').val());
+        console.log('日期选择：' + $('#daterange-btn span').html());
         console.log('组别：' + $('#group-name').val());
         layui.table.reload('group-data', {
-            url: '/api/group-data/?id=' + $('#group-name').val() + '&date-range=' + $('#date-range').val(),
+            url: '/api/group-data/?id=' + $('#group-name').val() + '&date-range=' + $('#daterange-btn span').html(),
         });
     }
 </script>

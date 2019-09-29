@@ -81,3 +81,10 @@ def getEveryDay(begin_date, end_date):
         date_list.append(date_str)
         begin_date += datetime.timedelta(days=1)
     return date_list
+
+
+def check_none(value):
+    if not value or value == 'undefined' or value == '':
+        return None
+    else:
+        return value

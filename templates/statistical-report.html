@@ -9,10 +9,15 @@
     <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0,minimum-scale=0.4,maximum-scale=3.0"/>
     <link rel="stylesheet" href="../static/css/font.css">
     <link rel="stylesheet" href="../static/css/xadmin.css">
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/daterangepicker.css">
     <link rel="stylesheet" href="../static/css/formSelects-v4.css">
+    <script src="../static/js/jquery.min.js" charset="utf-8"></script>
     <script src="../static/lib/layui/layui.js" charset="utf-8"></script>
     <script src="../static/js/formSelects-v4.js" charset="utf-8"></script>
     <script type="text/javascript" src="../static/js/xadmin.js"></script>
+    <script type="text/javascript" src="../static/js/moment.js"></script>
+    <script type="text/javascript" src="../static/js/daterangepicker.js"></script>
 
     <!--[if lt IE 9]>
           <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
@@ -34,15 +39,20 @@
                 <div class="layui-card-body ">
                     <div class="layui-form layui-col-space5">
                         <div class="layui-inline layui-show-xs-block layui-col-md1">
-                            <select name="data-source" id="data-source" style="height: 36px;">
+                            <select name="data-source" id="data-source">
                                 <option disabled>数据源</option>
                                 <option value="development" selected>新增数据</option>
                                 <option value="return">回访数据</option>
                             </select>
                         </div>
 
-                        <div class="layui-inline layui-show-xs-block layui-col-md2">
-                            <input class="layui-input" placeholder="日期范围" name="date-range" id="date-range" style="height: 36px;">
+                        <div class="layui-inline layui-show-xs-block layui-col-md2" style="width: 10%;">
+                            <button type="button" style="height: 36px" class="layui-btn layui-btn-primary" name="daterange-btn" id="daterange-btn">
+                                <span>
+                                  <i class="icon iconfont icon-calendar1"></i> 日期选择
+                                </span>
+                                <i class="icon iconfont icon-danxian-youjiantou-copy"></i>
+                            </button>
                         </div>
 
                         <div class="layui-inline layui-show-xs-block layui-col-md3">
@@ -79,7 +89,40 @@
         var laydate = layui.laydate;
         var form = layui.form;
         var formSelects = layui.formSelects;
-        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#date-range').val();
+        $('#daterange-btn span').html(moment().subtract(6, 'days').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
+        $('.ranges_1 ul').remove();
+        $('#daterange-btn').daterangepicker({
+                ranges: {
+                    '今天': [moment(), moment()],
+                    '昨天': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    '前天': [moment().subtract(2, 'days'), moment().subtract(2, 'days')],
+                    '过去7天': [moment().subtract(6, 'days'), moment()],
+                    '过去14天': [moment().subtract(13, 'days'), moment()],
+                    '过去30天': [moment().subtract(29, 'days'), moment()],
+                    '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    '过去90天': [moment().subtract(89, 'days'), moment()],
+                    '过去半年': [moment().subtract(179, 'days'), moment()],
+                    '上周(周日至周六)': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
+                    '上周(周一至周日)': [moment().subtract(1, 'week').startOf('week').subtract(-1, 'days'), moment().subtract(1, 'week').endOf('week').subtract(-1, 'days')],
+                },
+                startDate: moment().subtract(6, 'days'),
+                endDate: moment(),
+            }, function (start, end, label) {
+                console.log(label);
+                if (label == '今天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else if (label == '昨天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else if (label == '前天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                }
+                console.log($('#daterange-btn span').html());
+            }
+        );
+
+        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn span').html();
 
         loadSearchData(); //加载搜索栏数据
         layui.form.render();
@@ -160,7 +203,7 @@
                         console.log(data);
                         $.each(data.data.group, function (index) {
                             console.log(data.data.group[index]);
-                            var option = "<option value=\"" + data.data.group[index].id + "\">" + data.data.group[index].name + "</option>";
+                            var option = "<option selected value=\"" + data.data.group[index].id + "\">" + data.data.group[index].name + "</option>";
                             $("select[id=group-name]").append(option);
                         });
                         $.each(data.data.person, function (index) {
@@ -183,12 +226,12 @@
 
     function search_btn() {
         console.log('数据源：' + $('#data-source').val());
-        console.log('日期选择：' + $('#date-range').val());
+        console.log('日期选择：' + $('#daterange-btn span').html());
         console.log('组别：' + $('#group-name').val());
         console.log('花名：' + $('#username').val());
         console.log(layui.formSelects.value('username', 'val'));
         console.log(layui.formSelects.value('group-name', 'val'));
-        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#date-range').val();
+        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn span').html();
         if ($('#data-source').val() === 'development') {
             layui.table.reload('statistical-rate', {
                 url: '/api/statistical-rate-data/' + parameter,
@@ -244,7 +287,6 @@
                 }
             });
         }
-
     }
 
 </script>

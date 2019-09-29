@@ -29,46 +29,7 @@
                 </div>
             </div>
         </div>
-        <div class="layui-col-md12">
-            <div class="layui-card">
-                <div class="layui-card-header">系统数据</div>
-                <div class="layui-card-body ">
-                    <ul class="layui-row layui-col-space10 layui-this x-admin-carousel x-admin-backlog">
-                        <li class="layui-col-md2 layui-col-xs6">
-                            <a href="javascript:;" class="x-admin-backlog-body">
-                                <h3>成员数</h3>
-                                <p><cite id="person-count"></cite></p>
-                            </a>
-                        </li>
-                        <li class="layui-col-md2 layui-col-xs6">
-                            <a href="javascript:;" class="x-admin-backlog-body">
-                                <h3>分组数</h3>
-                                <p><cite id="group-count"></cite></p>
-                            </a>
-                        </li>
-                        <li class="layui-col-md2 layui-col-xs6">
-                            <a href="javascript:;" class="x-admin-backlog-body">
-                                <h3>新增数据</h3>
-                                <p><cite id="development-count"></cite></p>
-                            </a>
-                        </li>
-                        <li class="layui-col-md2 layui-col-xs6">
-                            <a href="javascript:;" class="x-admin-backlog-body">
-                                <h3>回访数据</h3>
-                                <p><cite id="return-count"></cite></p>
-                            </a>
-                        </li>
-                        <li class="layui-col-md2 layui-col-xs6">
-                            <a href="javascript:;" class="x-admin-backlog-body">
-                                <h3>绩效数据</h3>
-                                <p><cite id="performance-count"></cite></p>
-                            </a>
-                        </li>
 
-                    </ul>
-                </div>
-            </div>
-        </div>
         <div class="layui-col-md12">
             <div class="layui-card">
                 <div class="layui-card-header">昨日数据</div>
@@ -185,7 +146,52 @@
                 </div>
             </div>
         </div>
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">系统数据</div>
+                <div class="layui-card-body ">
+                    <ul class="layui-row layui-col-space10 layui-this x-admin-carousel x-admin-backlog">
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>成员数</h3>
+                                <p><cite id="person-count"></cite></p>
+                            </a>
+                        </li>
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>分组数</h3>
+                                <p><cite id="group-count"></cite></p>
+                            </a>
+                        </li>
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>新增数据</h3>
+                                <p><cite id="development-count"></cite></p>
+                            </a>
+                        </li>
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>回访数据</h3>
+                                <p><cite id="return-count"></cite></p>
+                            </a>
+                        </li>
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>绩效数据</h3>
+                                <p><cite id="performance-count"></cite></p>
+                            </a>
+                        </li>
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>公海数据</h3>
+                                <p><cite id="high-seas-count"></cite></p>
+                            </a>
+                        </li>
 
+                    </ul>
+                </div>
+            </div>
+        </div>
 
         <div class="layui-col-md12">
             <div class="layui-card">
@@ -237,6 +243,7 @@
                     $('#development-count').html(data.data.sys.development_count);
                     $('#return-count').html(data.data.sys.return_count);
                     $('#performance-count').html(data.data.sys.performance_count);
+                    $('#high-seas-count').html(data.data.sys.high_seas_count);
 
                     $('#new_value_day').html(data.data.panel.yesterday_development_new_volume);
                     $('#return_value_day').html(data.data.panel.yesterday_return_return_volume);

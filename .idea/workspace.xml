@@ -2,9 +2,40 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7cb8bc3e-35cd-4d6d-9511-d068ec720aa7" name="默认更改列表" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/python.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/exception_decor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/exception_logger.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/css/bootstrap.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/css/daterangepicker.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/js/daterangepicker.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/js/moment.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/report-highseas-data-add.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/report-highseas-data-edit.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/report-highseas-data.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Report/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Report/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Report/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Report/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Report/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Performance_Report_API/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Performance_Report_API/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Performance_Report_API/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Performance_Report_API/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/group.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/group.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/panel.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/panel.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/report-development-data-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-development-data-add.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/report-development-data.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-development-data.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/report-performance-data-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-performance-data-add.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/report-performance-data-edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-performance-data-edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/report-performance-data.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-performance-data.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/report-return-data-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-return-data-add.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/report-return-data.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-return-data.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/statistical-echarts.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/statistical-echarts.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/statistical-report.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/statistical-report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/top.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/top.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/user.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/user.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -63,18 +94,19 @@
     <property name="DatabaseDriversLRU" value="mysql" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="E:/Workspace/python-demo/Spider/写真图片/MM多线程.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/static/js" />
     <property name="settings.editor.selected.configurable" value="configurable.group.project" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\GitHub\Performance_Report_API\static\js" />
+      <recent name="E:\GitHub\Performance_Report_API\static\css" />
       <recent name="E:\GitHub\Performance_Report_API\templates" />
       <recent name="E:\GitHub\Performance_Report_API\static" />
       <recent name="E:\GitHub\Performance_Report_API\static\lib\layui" />
-      <recent name="E:\GitHub\Performance_Report_API\static\css" />
-      <recent name="E:\GitHub\Performance_Report_API\static\js" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\GitHub\Performance_Report_API\API" />
       <recent name="E:\GitHub\Performance_Report_API\static\lib\layui" />
       <recent name="E:\GitHub\Performance_Report_API\static\js" />
     </key>
@@ -91,7 +123,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Django server.Performance_Report_API">
+  <component name="RunManager">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="Performance_Report_api" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -99,35 +131,13 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="E:\GitHub\Performance_Report_API\venv\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="utils" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="Performance_Report_api" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/API" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/API/utils.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -151,7 +161,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="launchJavascriptDebuger" value="false" />
       <option name="port" value="8000" />
-      <option name="host" value="0.0.0.0" />
+      <option name="host" value="127.0.0.1" />
       <option name="additionalOptions" value="" />
       <option name="browserUrl" value="" />
       <option name="runTestServer" value="false" />
@@ -160,15 +170,6 @@
       <option name="customRunCommand" value="" />
       <method v="2" />
     </configuration>
-    <list>
-      <item itemvalue="Django server.Performance_Report_API" />
-      <item itemvalue="Python.utils" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.utils" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="ServiceViewManager">
     <option name="allServicesViewState">
@@ -201,7 +202,7 @@
       <workItem from="1569377287438" duration="52911000" />
       <workItem from="1569545505902" duration="15072000" />
       <workItem from="1569564959874" duration="2158000" />
-      <workItem from="1569567936325" duration="19512000" />
+      <workItem from="1569567936325" duration="47982000" />
     </task>
     <servers />
   </component>
@@ -232,6 +233,7 @@
     </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Performance_Report_API$utils.coverage" NAME="utils Coverage Results" MODIFIED="1569397863830" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/API" />
+    <SUITE FILE_PATH="coverage/Performance_Report_API$test.coverage" NAME="test Coverage Results" MODIFIED="1569729440294" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/API" />
+    <SUITE FILE_PATH="coverage/Performance_Report_API$utils.coverage" NAME="utils Coverage Results" MODIFIED="1569657478569" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/API" />
   </component>
 </project>

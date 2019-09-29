@@ -2,7 +2,7 @@
 <html class="x-admin-sm">
 <head>
     <meta charset="UTF-8">
-    <title>业务报表系统 - 修改绩效数据</title>
+    <title>业务报表系统 - 修改公海数据</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     {# <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>#}
@@ -29,59 +29,47 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label for="new-addition-volume" class="layui-form-label">
-                    新加量</label>
+                <label for="high-seas-volume" class="layui-form-label">
+                    公海量</label>
                 <div class="layui-input-inline">
-                    <input type="number" value="{{ performance_data.new_addition_volume }}" id="new-addition-volume" name="new-addition-volume" class="layui-input" lay-verify="numberOrEmpty"></div>
+                    <input type="number" value="{{ return_data.high_seas_volume }}" id="high-seas-volume" name="high-seas-volume" class="layui-input" lay-verify="numberOrEmpty"></div>
             </div>
             <div class="layui-form-item">
-                <label for="talkable-volume" class="layui-form-label">
-                    可聊量</label>
+                <label for="successful-opening" class="layui-form-label">
+                    成功开场</label>
                 <div class="layui-input-inline">
-                    <input type="number" value="{{ performance_data.talkable_volume }}" id="talkable-volume" name="talkable-volume" class="layui-input" lay-verify="numberOrEmpty"></div>
+                    <input type="number" value="{{ return_data.success_opening_volume }}" id="successful-opening" name="successful-opening" class="layui-input" lay-verify="numberOrEmpty"></div>
             </div>
             <div class="layui-form-item">
-                <label for="work-customer-volume" class="layui-form-label">
-                    Work客户量</label>
+                <label for="business-introduction" class="layui-form-label">
+                    业务介绍</label>
                 <div class="layui-input-inline">
-                    <input type="number" value="{{ performance_data.work_customer_volume }}" id="work-customer-volume" name="work-customer-volume" class="layui-input" lay-verify="numberOrEmpty"></div>
+                    <input type="number" value="{{ return_data.business_introduction_volume }}" id="business-introduction" name="business-introduction" class="layui-input" lay-verify="numberOrEmpty"></div>
             </div>
             <div class="layui-form-item">
-                <label for="transaction-volume" class="layui-form-label">
-                    成交量</label>
+                <label for="answer-questions" class="layui-form-label">
+                    解答问题</label>
                 <div class="layui-input-inline">
-                    <input type="number" value="{{ performance_data.transaction_volume }}" id="transaction-volume" name="transaction-volume" class="layui-input" lay-verify="numberOrEmpty"></div>
+                    <input type="number" value="{{ return_data.answer_question_volume }}" id="answer-questions" name="answer-questions" class="layui-input" lay-verify="numberOrEmpty"></div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label"><span class="x-red">*</span>成交来源</label>
-                <div class="layui-input-inline layui-show-xs-block">
-                    <select id="data-source" name="data-source" lay-verify="data-source">
-                        <option disabled>成交来源</option>
-                        {% if performance_data.source == 0 %}
-                            <option value="0" selected>新增数据</option>
-                            <option value="1">回访数据</option>
-                            <option value="2">公海数据</option>
-                        {% elif performance_data.source == 1 %}
-                            <option value="0">新增数据</option>
-                            <option value="1" selected>回访数据</option>
-                            <option value="2">公海数据</option>
-                        {% elif performance_data.source == 2 %}
-                            <option value="0">新增数据</option>
-                            <option value="1">回访数据</option>
-                            <option value="2" selected>公海数据</option>
-                        {% else %}
-                            <option value="0">新增数据</option>
-                            <option value="1">回访数据</option>
-                            <option value="2">公海数据</option>
-                        {% endif %}
-                    </select>
-                </div>
+                <label for="contract-payment" class="layui-form-label">
+                    约定付款</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="contract-payment" name="contract-payment" class="layui-input" value="{{ return_data.contract_pay_volume }}" lay-verify="numberOrEmpty"></div>
+            </div>
+
+            <div class="layui-form-item">
+                <label for="quality-error" class="layui-form-label">
+                    质检差错数</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="quality-error" name="quality-error" class="layui-input" value="{{ return_data.quality_error_volume }}" lay-verify="numberOrEmpty"></div>
             </div>
             <div class="layui-form-item">
                 <label for="data-date" class="layui-form-label">
                     <span class="x-red">*</span>数据日期</label>
                 <div class="layui-input-inline">
-                    <input class="layui-input" placeholder="数据日期" name="data-date" id="data-date" value="{{ performance_data.data_time }}">
+                    <input class="layui-input" placeholder="数据日期" name="data-date" id="data-date" value="{{ return_data.data_time }}">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -114,25 +102,27 @@
 
     function edit() {
         console.log($('#username').val());
-        console.log($('#new-addition-volume').val());
-        console.log($('#talkable-volume').val());
-        console.log($('#work-customer-volume').val());
-        console.log($('#transaction-volume').val());
-        console.log($('#data-source').val());
+        console.log($('#high-seas-volume').val());
+        console.log($('#successful-opening').val());
+        console.log($('#business-introduction').val());
+        console.log($('#answer-questions').val());
+        console.log($('#contract-payment').val());
+        console.log($('#quality-error').val());
         console.log($('#data-date').val());
         $.ajax({
-            url: '/api/performance-data/',
+            url: '/api/high-seas-data/',
             type: 'POST',
             dataType: 'json',
             data: {
                 'operating': 'edit',
-                'id':{{ performance_data.id }},
+                'id':{{ return_data.id }},
                 'person_id': $('#username').val(),
-                'new_addition_volume': $('#new-addition-volume').val(),
-                'talkable_volume': $('#talkable-volume').val(),
-                'work_customer_volume': $('#work-customer-volume').val(),
-                'transaction_volume': $('#transaction-volume').val(),
-                'data_source': $('#data-source').val(),
+                'high_seas_volume': $('#high-seas-volume').val(),
+                'success_opening_volume': $('#successful-opening').val(),
+                'business_introduction_volume': $('#business-introduction').val(),
+                'answer_question_volume': $('#answer-questions').val(),
+                'contract_pay_volume': $('#contract-payment').val(),
+                'quality_error_volume': $('#quality-error').val(),
                 'data_time': $('#data-date').val(),
             },
             error: function (error) {
@@ -144,8 +134,8 @@
                         function () {
                             console.log('{{ search }}');
                             xadmin.close();
-                            parent.layui.table.reload('performance-data', {
-                                url: '/api/performance-data/?person_id={{ search.person_id }}&group_id={{ search.group_id }}&date_range={{ search.date_range }}',
+                            parent.layui.table.reload('high-seas-data', {
+                                url: '/api/high-seas-data/?person_id={{ search.person_id }}&group_id={{ search.group_id }}&date_range={{ search.date_range }}',
                             });
                             //xadmin.father_reload();
                         });
@@ -168,10 +158,10 @@
                         console.log(data.data.person[index]);
                         var person_id = data.data.person[index].id;
                         var person_name = data.data.person[index].name;
-                        if (person_id === {{performance_data.person_id.id}}) {
+                        if(person_id === {{return_data.person_id.id}}){
                             var option = "<option selected value=\"" + person_id + "\">" + person_name + "</option>";
                             $("select[id=username]").append(option);
-                        } else {
+                        }else {
                             var option = "<option value=\"" + person_id + "\">" + person_name + "</option>";
                             $("select[id=username]").append(option);
                         }

@@ -9,10 +9,15 @@
     <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0,minimum-scale=0.4,maximum-scale=3.0"/>
     <link rel="stylesheet" href="../static/css/font.css">
     <link rel="stylesheet" href="../static/css/xadmin.css">
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/daterangepicker.css">
     <link rel="stylesheet" href="../static/css/formSelects-v4.css">
+    <script src="../static/js/jquery.min.js" charset="utf-8"></script>
     <script src="../static/lib/layui/layui.js" charset="utf-8"></script>
     <script src="../static/js/formSelects-v4.js" charset="utf-8"></script>
     <script type="text/javascript" src="../static/js/xadmin.js"></script>
+    <script type="text/javascript" src="../static/js/moment.js"></script>
+    <script type="text/javascript" src="../static/js/daterangepicker.js"></script>
     <script type="text/javascript" src="../static/echarts-lib/echarts.min.js"></script>
 
     <!--[if lt IE 9]>
@@ -34,8 +39,13 @@
             <div class="layui-card">
                 <div class="layui-card-body layui-row">
                     <div class="layui-form layui-col-space5">
-                        <div class="layui-inline layui-show-xs-block layui-col-md2">
-                            <input class="layui-input" placeholder="日期范围" name="date-range" id="date-range" style="height: 36px;">
+                        <div class="layui-inline layui-show-xs-block layui-col-md2" style="width: 10%;">
+                            <button type="button" style="height: 36px" class="layui-btn layui-btn-primary" name="daterange-btn" id="daterange-btn">
+                                <span>
+                                  <i class="icon iconfont icon-calendar1"></i> 日期选择
+                                </span>
+                                <i class="icon iconfont icon-danxian-youjiantou-copy"></i>
+                            </button>
                         </div>
 
                         <div class="layui-inline layui-show-xs-block layui-col-md3">
@@ -75,7 +85,41 @@
         var laydate = layui.laydate;
         var form = layui.form;
         var formSelects = layui.formSelects;
-        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#date-range').val();
+
+        $('#daterange-btn span').html(moment().subtract(6, 'days').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
+        $('.ranges_1 ul').remove();
+        $('#daterange-btn').daterangepicker({
+                ranges: {
+                    '今天': [moment(), moment()],
+                    '昨天': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    '前天': [moment().subtract(2, 'days'), moment().subtract(2, 'days')],
+                    '过去7天': [moment().subtract(6, 'days'), moment()],
+                    '过去14天': [moment().subtract(13, 'days'), moment()],
+                    '过去30天': [moment().subtract(29, 'days'), moment()],
+                    '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    '过去90天': [moment().subtract(89, 'days'), moment()],
+                    '过去半年': [moment().subtract(179, 'days'), moment()],
+                    '上周(周日至周六)': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
+                    '上周(周一至周日)': [moment().subtract(1, 'week').startOf('week').subtract(-1, 'days'), moment().subtract(1, 'week').endOf('week').subtract(-1, 'days')],
+                },
+                startDate: moment().subtract(6, 'days'),
+                endDate: moment(),
+            }, function (start, end, label) {
+                console.log(label);
+                if (label == '今天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else if (label == '昨天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else if (label == '前天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                }
+                console.log($('#daterange-btn span').html());
+            }
+        );
+
+        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn span').html();
         loadSearchData(); //加载搜索栏数据
         laydate.render({
             elem: '#date-range', range: true
@@ -104,7 +148,7 @@
                         console.log(data);
                         $.each(data.data.group, function (index) {
                             console.log(data.data.group[index]);
-                            var option = "<option value=\"" + data.data.group[index].id + "\">" + data.data.group[index].name + "</option>";
+                            var option = "<option selected value=\"" + data.data.group[index].id + "\">" + data.data.group[index].name + "</option>";
                             $("select[id=group-name]").append(option);
                         });
                         $.each(data.data.person, function (index) {
@@ -124,154 +168,139 @@
                 }
             });
         }
+
+        search_btn();
     });
 
 
-    var Chart1 = echarts.init(document.getElementById('echarts-new-data'));
-    option1 = {
-        title: {
-            text: '新加数 - 趋势图',
-        },
-        tooltip: {
-            trigger: 'axis'
-        },
-        legend: {
-            data: []
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        toolbox: {
-            show: true,
-            showTitle: false, // 隐藏默认文字，否则两者位置会重叠
-            feature: {
-                magicType: {
-                    type: ['line', 'bar', 'tiled']
-                },
-                saveAsImage: {
-                    show: true,
-                    title: '保存为图片'
-                },
-                dataView: {
-                    show: true,
-                    title: '数据视图'
-                },
-            },
-            tooltip: { // 和 option.tooltip 的配置项相同
-                show: true,
-                formatter: function (param) {
-                    return '<div>' + param.title + '</div>'; // 自定义的 DOM 结构
-                },
-                backgroundColor: '#222',
-                textStyle: {
-                    fontSize: 12,
-                },
-                extraCssText: 'box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);' // 自定义的 CSS 样式
-            }
-        },
-        xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: []
-        },
-        yAxis: {
-            type: 'value',
-            minInterval: 10
-        },
-    };
-    Chart1.setOption(option1);
-
-    var Chart2 = echarts.init(document.getElementById('echarts-return-data'));
-    option2 = {
-        title: {
-            text: '回访量 - 趋势图',
-        },
-        tooltip: {
-            trigger: 'axis'
-        },
-        legend: {
-            data: []
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        toolbox: {
-            show: true,
-            showTitle: false, // 隐藏默认文字，否则两者位置会重叠
-            feature: {
-                magicType: {
-                    type: ['line', 'bar', 'tiled']
-                },
-                saveAsImage: {
-                    show: true,
-                    title: '保存为图片'
-                },
-                dataView: {
-                    show: true,
-                    title: '数据视图'
-                },
-            },
-            tooltip: { // 和 option.tooltip 的配置项相同
-                show: true,
-                formatter: function (param) {
-                    return '<div>' + param.title + '</div>'; // 自定义的 DOM 结构
-                },
-                backgroundColor: '#222',
-                textStyle: {
-                    fontSize: 12,
-                },
-                extraCssText: 'box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);' // 自定义的 CSS 样式
-            }
-        },
-        xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: []
-        },
-        yAxis: {
-            type: 'value',
-            minInterval: 10
-        }
-    };
-    Chart2.setOption(option2);
-
     function search_btn() {
-        if ((layui.formSelects.value('username', 'val') === '' && $('#date-range').val() === '') || $('#date-range').val() === '') {
+        /*if ((layui.formSelects.value('username', 'val') === '' && $('#daterange-btn span').html() === '') || $('#daterange-btn span').html() === '') {
             layer.msg('请选择筛选条件', {icon: 2, time: 1000});
             return false;
-        }
-        var parameter = '?obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#date-range').val();
+        }*/
+        var parameter = '?obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn span').html();
         console.log(parameter);
+        var Chart1 = echarts.init(document.getElementById('echarts-new-data'));
+        var Chart2 = echarts.init(document.getElementById('echarts-return-data'));
         Chart1.showLoading();
         Chart2.showLoading();
         $.get('/api/statistical-echarts-data/' + parameter).done(function (data) {
             Chart1.hideLoading();
             Chart2.hideLoading();
             console.log(data.data);
-            Chart1.setOption({
+            option1 = {
+                title: {
+                    text: '新加数 - 趋势图',
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
                 legend: {
                     data: data.data.new.legend
                 },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    show: true,
+                    showTitle: false, // 隐藏默认文字，否则两者位置会重叠
+                    feature: {
+                        magicType: {
+                            type: ['line', 'bar', 'tiled']
+                        },
+                        saveAsImage: {
+                            show: true,
+                            title: '保存为图片'
+                        },
+                        dataView: {
+                            show: true,
+                            title: '数据视图'
+                        },
+                    },
+                    tooltip: { // 和 option.tooltip 的配置项相同
+                        show: true,
+                        formatter: function (param) {
+                            return '<div>' + param.title + '</div>'; // 自定义的 DOM 结构
+                        },
+                        backgroundColor: '#222',
+                        textStyle: {
+                            fontSize: 12,
+                        },
+                        extraCssText: 'box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);' // 自定义的 CSS 样式
+                    }
+                },
                 xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
                     data: data.data.new.xAxis_data
                 },
+                yAxis: {
+                    type: 'value',
+                    minInterval: 10
+                },
                 series: data.data.new.series
-            });
-            Chart2.setOption({
+            };
+            Chart1.setOption(option1, true);
+
+            option2 = {
+                title: {
+                    text: '回访量 - 趋势图',
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
                 legend: {
                     data: data.data.return.legend
                 },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    show: true,
+                    showTitle: false, // 隐藏默认文字，否则两者位置会重叠
+                    feature: {
+                        magicType: {
+                            type: ['line', 'bar', 'tiled']
+                        },
+                        saveAsImage: {
+                            show: true,
+                            title: '保存为图片'
+                        },
+                        dataView: {
+                            show: true,
+                            title: '数据视图'
+                        },
+                    },
+                    tooltip: { // 和 option.tooltip 的配置项相同
+                        show: true,
+                        formatter: function (param) {
+                            return '<div>' + param.title + '</div>'; // 自定义的 DOM 结构
+                        },
+                        backgroundColor: '#222',
+                        textStyle: {
+                            fontSize: 12,
+                        },
+                        extraCssText: 'box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);' // 自定义的 CSS 样式
+                    }
+                },
                 xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
                     data: data.data.return.xAxis_data
                 },
+                yAxis: {
+                    type: 'value',
+                    minInterval: 10
+                },
                 series: data.data.return.series
-            });
+            };
+            Chart2.setOption(option2, true);
         });
     }
 </script>

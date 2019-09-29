@@ -25,6 +25,7 @@ urlpatterns = [
     path('group-data/', views.group_data_api),
     path('development-data/', views.development_data_api),
     path('return-data/', views.return_data_api),
+    path('high-seas-data/', views.high_seas_data_api),
     path('performance-data/', views.performance_data_api),
 
     # 数据计算

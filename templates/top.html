@@ -9,8 +9,13 @@
     <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0,minimum-scale=0.4,maximum-scale=3.0"/>
     <link rel="stylesheet" href="../static/css/font.css">
     <link rel="stylesheet" href="../static/css/xadmin.css">
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/daterangepicker.css">
+    <script src="../static/js/jquery.min.js" charset="utf-8"></script>
     <script src="../static/lib/layui/layui.js" charset="utf-8"></script>
     <script type="text/javascript" src="../static/js/xadmin.js"></script>
+    <script type="text/javascript" src="../static/js/moment.js"></script>
+    <script type="text/javascript" src="../static/js/daterangepicker.js"></script>
     <!--[if lt IE 9]>
           <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
           <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
@@ -35,14 +40,19 @@
                         <div class="layui-inline layui-show-xs-block">
                             <select id="num" name="num" lay-verify="num">
                                 <option value="">显示前多少名</option>
-                                <option value="10">前十名</option>
+                                <option value="10" selected>前十名</option>
                                 <option value="15">前十五名</option>
                                 <option value="20">前二十名</option>
                                 <option value="30">前三十名</option>
                             </select>
                         </div>
                         <div class="layui-inline layui-show-xs-block">
-                            <input class="layui-input" placeholder="日期范围" name="date-range" id="date-range">
+                            <button type="button" class="layui-btn layui-btn-primary" name="daterange-btn" id="daterange-btn">
+                                <span>
+                                  <i class="icon iconfont icon-calendar1"></i> 日期选择
+                                </span>
+                                <i class="icon iconfont icon-danxian-youjiantou-copy"></i>
+                            </button>
                         </div>
                         <div class="layui-inline layui-show-xs-block">
                             <button id="search" class="layui-btn" lay-filter="search" onclick="search_btn();return false;"><i class="layui-icon">&#xe615;</i></button>
@@ -89,9 +99,42 @@
             elem: '#date-range', range: true
         });
 
+        $('#daterange-btn span').html(moment().subtract(6, 'days').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
+        $('.ranges_1 ul').remove();
+        $('#daterange-btn').daterangepicker({
+                ranges: {
+                    '今天': [moment(), moment()],
+                    '昨天': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    '前天': [moment().subtract(2, 'days'), moment().subtract(2, 'days')],
+                    '过去7天': [moment().subtract(6, 'days'), moment()],
+                    '过去14天': [moment().subtract(13, 'days'), moment()],
+                    '过去30天': [moment().subtract(29, 'days'), moment()],
+                    '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    '过去90天': [moment().subtract(89, 'days'), moment()],
+                    '过去半年': [moment().subtract(179, 'days'), moment()],
+                    '上周(周日至周六)': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
+                    '上周(周一至周日)': [moment().subtract(1, 'week').startOf('week').subtract(-1, 'days'), moment().subtract(1, 'week').endOf('week').subtract(-1, 'days')],
+                },
+                startDate: moment().subtract(6, 'days'),
+                endDate: moment(),
+            }, function (start, end, label) {
+                console.log(label);
+                if (label == '今天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else if (label == '昨天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else if (label == '前天') {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                } else {
+                    $('#daterange-btn span').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                }
+                console.log($('#daterange-btn span').html());
+            }
+        );
+
         table.render({
             elem: '#new-table',
-            url: '/api/top-data/?date-range=' + $('#date-range').val() + '&num=' + $('#num').val(),
+            url: '/api/top-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
             cellMinWidth: 80,
             height: 'full-200',
             title: '用户数据表',
@@ -115,7 +158,7 @@
 
         table.render({
             elem: '#return-table',
-            url: '/api/top-data/?date-range=' + $('#date-range').val() + '&num=' + $('#num').val(),
+            url: '/api/top-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
             cellMinWidth: 80,
             height: 'full-200',
             title: '用户数据表',
@@ -138,7 +181,7 @@
 
         table.render({
             elem: '#transaction-table',
-            url: '/api/top-data/?date-range=' + $('#date-range').val() + '&num=' + $('#num').val(),
+            url: '/api/top-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
             cellMinWidth: 80,
             height: 'full-200',
             title: '用户数据表',
@@ -161,7 +204,7 @@
 
         table.render({
             elem: '#rate-table',
-            url: '/api/top-data/?date-range=' + $('#date-range').val() + '&num=' + $('#num').val(),
+            url: '/api/top-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
             cellMinWidth: 80,
             height: 'full-200',
             title: '用户数据表',
@@ -185,16 +228,16 @@
 
     function search_btn() {
         layui.table.reload('new-table', {
-            url: '/api/top-data/?date-range=' + $('#date-range').val() + '&num=' + $('#num').val(),
+            url: '/api/top-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
         });
         layui.table.reload('return-table', {
-            url: '/api/top-data/?date-range=' + $('#date-range').val() + '&num=' + $('#num').val(),
+            url: '/api/top-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
         });
         layui.table.reload('transaction-table', {
-            url: '/api/top-data/?date-range=' + $('#date-range').val() + '&num=' + $('#num').val(),
+            url: '/api/top-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
         });
         layui.table.reload('rate-table', {
-           url: '/api/top-data/?date-range=' + $('#date-range').val() + '&num=' + $('#num').val(),
+            url: '/api/top-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
         });
     }
 </script>

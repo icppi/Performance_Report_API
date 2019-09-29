@@ -74,7 +74,8 @@
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label"></label>
-                <button class="layui-btn" lay-filter="add" id="add" onclick="add();return false;">添加</button>
+                <button class="layui-btn" lay-filter="add" id="add" onclick="add_btn();return false;">保存</button>
+                <button class="layui-btn" lay-filter="add-another" id="add-another" onclick="add_another_btn();return false;">保存并添加下一个</button>
             </div>
         </div>
     </div>
@@ -130,15 +131,54 @@
         });
     }
 
+    function add_another_btn() {
+        add();
+        var username = parent.$('#username').val();
+        var group = parent.$('#group-name').val();
+        var date_range = parent.$('#date-range').val();
+        var search_value = '&search={\'person_id\':\'' + username + '\',\'group_id\':\'' + group + '\',\'date_range\':\'' + date_range + '\'}';
+        xadmin.close();
+        parent.layui.layer.open({
+            type: 2,
+            title: '添加回访数据',
+            content: ['/api/return-data/?event=add' + search_value],
+            area: ['460px', '600px']
+        });
+    }
+
     function add() {
-        console.log($('#username').val());
-        console.log($('#return-visit-volume').val());
-        console.log($('#successful-opening').val());
-        console.log($('#business-introduction').val());
-        console.log($('#answer-questions').val());
-        console.log($('#contract-payment').val());
-        console.log($('#quality-error').val());
-        console.log($('#data-date').val());
+        $.ajax({
+            url: '/api/return-data/',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                'operating': 'add',
+                'person_id': $('#username').val(),
+                'return_visit_volume': $('#return-visit-volume').val(),
+                'success_opening_volume': $('#successful-opening').val(),
+                'business_introduction_volume': $('#business-introduction').val(),
+                'answer_question_volume': $('#answer-questions').val(),
+                'contract_pay_volume': $('#contract-payment').val(),
+                'quality_error_volume': $('#quality-error').val(),
+                'data_time': $('#data-date').val(),
+            },
+            error: function (error) {
+                layer.alert('网络连接错误', {icon: 2, time: 1000});
+            },
+            success: function (data) {
+                if (data.code === 0) {
+                    layer.msg(data.msg, {icon: 6, time: 1000},
+                        function () {
+                            console.log('{{ search }}');
+                        });
+                } else {
+                    layer.msg(data.msg, {icon: 2, time: 1000});
+                }
+            }
+        });
+    }
+
+    function add_btn() {
         $.ajax({
             url: '/api/return-data/',
             type: 'POST',

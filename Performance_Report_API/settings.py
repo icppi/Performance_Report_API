@@ -24,7 +24,7 @@ SECRET_KEY = 'k@ctnaj3y^u&8-i3keuym_%z$vn$pq1g6$*4$@)$dqgjsdomug'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', ]
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -121,7 +121,7 @@ USE_I18N = True
 
 USE_L10N = False
 
-USE_TZ = True
+USE_TZ = False
 
 DATE_FORMAT = 'Y-m-d'
 DATETIME_FORMAT = 'Y-m-d H:i:s'
