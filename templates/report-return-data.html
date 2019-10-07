@@ -8,6 +8,7 @@
     {# <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>#}
     <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0,minimum-scale=0.4,maximum-scale=3.0"/>
     <link rel="stylesheet" href="../static/css/font.css">
+    <link rel="stylesheet" href="../static/fonts/iconfont.css">
     <link rel="stylesheet" href="../static/css/xadmin.css">
     <link rel="stylesheet" href="../static/css/bootstrap.css">
     <link rel="stylesheet" href="../static/css/daterangepicker.css">
@@ -37,6 +38,8 @@
                     <div class="layui-form layui-col-space5">
                         <div class="layui-inline layui-show-xs-block">
                             <button type="button" class="layui-btn layui-btn-primary" name="daterange-btn" id="daterange-btn">
+                                <span style="display: none">
+                                </span>
                                 <span>
                                   <i class="icon iconfont icon-calendar1"></i> 日期选择
                                 </span>
@@ -88,7 +91,8 @@
         var laydate = layui.laydate;
         var form = layui.form;
 
-        $('#daterange-btn span').html(moment().subtract(6, 'days').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
+        $('#daterange-btn > span:nth-child(1)').html(moment().subtract(6, 'days').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
+        $('#daterange-btn > span:nth-child(2)').html('过去七天');
         $('.ranges_1 ul').remove();
         $('#daterange-btn').daterangepicker({
                 ranges: {
@@ -103,21 +107,51 @@
                     '过去半年': [moment().subtract(179, 'days'), moment()],
                     '上周(周日至周六)': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
                     '上周(周一至周日)': [moment().subtract(1, 'week').startOf('week').subtract(-1, 'days'), moment().subtract(1, 'week').endOf('week').subtract(-1, 'days')],
+                    '自选': [moment(), [moment(), moment().subtract(-1, 'days')],],
                 },
                 startDate: moment().subtract(6, 'days'),
                 endDate: moment(),
+                maxDate: moment(),
             }, function (start, end, label) {
                 console.log(label);
                 if (label == '今天') {
-                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('今天');
                 } else if (label == '昨天') {
-                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('昨天');
                 } else if (label == '前天') {
-                    $('#daterange-btn span').html(start.format('YYYY-MM-DD'));
-                } else {
-                    $('#daterange-btn span').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('前天');
+                } else if (label == '过去7天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('过去7天');
+                } else if (label == '过去14天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('过去14天');
+                } else if (label == '过去30天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('过去30天');
+                } else if (label == '上月') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('上月');
+                } else if (label == '过去90天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('过去90天');
+                } else if (label == '过去半年') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('过去半年');
+                } else if (label == '上周(周日至周六)') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('上周(周日至周六)');
+                } else if (label == '上周(周一至周日)') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('上周(周一至周日)');
+                } else if (label == '自选') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
                 }
-                console.log($('#daterange-btn span').html());
+                console.log($('#daterange-btn > span:nth-child(1)').html());
             }
         );
 

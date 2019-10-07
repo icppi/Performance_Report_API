@@ -2,35 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7cb8bc3e-35cd-4d6d-9511-d068ec720aa7" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/python.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/API/exception_decor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/API/exception_logger.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/bootstrap.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/daterangepicker.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/daterangepicker.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/moment.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/report-highseas-data-add.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/report-highseas-data-edit.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/report-highseas-data.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/fonts/iconfont.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Performance_Report_API/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Performance_Report_API/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Performance_Report_API/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Performance_Report_API/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/group.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/group.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/panel.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/panel.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-development-data-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-development-data-add.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/report-development-data.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-development-data.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-performance-data-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-performance-data-add.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-performance-data-edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-performance-data-edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/report-highseas-data.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-highseas-data.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/report-performance-data.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-performance-data.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-return-data-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-return-data-add.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/report-return-data.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-return-data.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/statistical-echarts.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/statistical-echarts.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/statistical-report.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/statistical-report.html" afterDir="false" />
@@ -94,21 +71,21 @@
     <property name="DatabaseDriversLRU" value="mysql" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/static/js" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/static/fonts" />
     <property name="settings.editor.selected.configurable" value="configurable.group.project" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="E:\GitHub\Performance_Report_API\static\js" />
-      <recent name="E:\GitHub\Performance_Report_API\static\css" />
-      <recent name="E:\GitHub\Performance_Report_API\templates" />
-      <recent name="E:\GitHub\Performance_Report_API\static" />
-      <recent name="E:\GitHub\Performance_Report_API\static\lib\layui" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="E:\GitHub\Performance_Report_API\API" />
       <recent name="E:\GitHub\Performance_Report_API\static\lib\layui" />
       <recent name="E:\GitHub\Performance_Report_API\static\js" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\GitHub\Performance_Report_API\static\fonts" />
+      <recent name="E:\GitHub\Performance_Report_API\static\js" />
+      <recent name="E:\GitHub\Performance_Report_API\static\css" />
+      <recent name="E:\GitHub\Performance_Report_API\templates" />
+      <recent name="E:\GitHub\Performance_Report_API\static" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -203,6 +180,9 @@
       <workItem from="1569545505902" duration="15072000" />
       <workItem from="1569564959874" duration="2158000" />
       <workItem from="1569567936325" duration="47982000" />
+      <workItem from="1569745896726" duration="5016000" />
+      <workItem from="1569757496529" duration="1252000" />
+      <workItem from="1570365100373" duration="644000" />
     </task>
     <servers />
   </component>
