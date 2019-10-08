@@ -1,0 +1,1 @@
+python /www/py_project/Performance_Report_API/manage.py runserver 0.0.0.0:8001

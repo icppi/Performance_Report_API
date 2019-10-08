@@ -86,12 +86,12 @@
 
 <script>
     layui.use(['form', 'laydate', 'table'], function () {
-        //var $ = layui.jquery;
+        // var $ = layui.jquery;
         var table = layui.table;
         var laydate = layui.laydate;
         var form = layui.form;
 
-        $('#daterange-btn > span:nth-child(1)').html(moment().subtract(6, 'days').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
+        $('#daterange-btn > span:nth-child(1)').html(moment().subtract(7, 'days').format('YYYY-MM-DD') + ' - ' + moment().subtract(1, 'days').format('YYYY-MM-DD'));
         $('#daterange-btn > span:nth-child(2)').html('过去七天');
         $('.ranges_1 ul').remove();
         $('#daterange-btn').daterangepicker({
@@ -99,18 +99,18 @@
                     '今天': [moment(), moment()],
                     '昨天': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     '前天': [moment().subtract(2, 'days'), moment().subtract(2, 'days')],
-                    '过去7天': [moment().subtract(6, 'days'), moment()],
-                    '过去14天': [moment().subtract(13, 'days'), moment()],
-                    '过去30天': [moment().subtract(29, 'days'), moment()],
+                    '过去7天': [moment().subtract(7, 'days'), moment().subtract(1, 'days')],
+                    '过去14天': [moment().subtract(14, 'days'), moment().subtract(1, 'days')],
+                    '过去30天': [moment().subtract(30, 'days'), moment().subtract(1, 'days')],
                     '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                    '过去90天': [moment().subtract(89, 'days'), moment()],
-                    '过去半年': [moment().subtract(179, 'days'), moment()],
+                    '过去90天': [moment().subtract(90, 'days'), moment().subtract(1, 'days')],
+                    '过去半年': [moment().subtract(180, 'days'), moment().subtract(1, 'days')],
                     '上周(周日至周六)': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
                     '上周(周一至周日)': [moment().subtract(1, 'week').startOf('week').subtract(-1, 'days'), moment().subtract(1, 'week').endOf('week').subtract(-1, 'days')],
                     '自选': [moment(), [moment(), moment().subtract(-1, 'days')],],
                 },
-                startDate: moment().subtract(6, 'days'),
-                endDate: moment(),
+                startDate: moment().subtract(7, 'days'),
+                endDate: moment().subtract(1, 'days'),
                 maxDate: moment(),
             }, function (start, end, label) {
                 console.log(label);
@@ -181,15 +181,15 @@
             cols: [[
                 {type: 'checkbox', fixed: 'left'},
                 {field: 'data_time', title: '数据日期', width: 120, fixed: 'left', unresize: true, sort: true, align: 'center'},
-                {field: 'id', title: 'ID', width: 80, fixed: 'left', unresize: true, sort: true, align: 'center',totalRowText: '合计：'},
+                {field: 'id', title: 'ID', width: 80, fixed: 'left', unresize: true, sort: true, align: 'center', totalRowText: '合计：'},
                 {field: 'person_name', title: '用户名', align: 'center', width: 120, sort: true},
                 {field: 'group_name', title: '组别', align: 'center', width: 120, sort: true},
-                {field: 'return_visit_volume', title: '回访量', align: 'center', width: 100, sort: true,totalRow: true},
-                {field: 'success_opening_volume', title: '成功开场', align: 'center', width: 100, sort: true,totalRow: true},
-                {field: 'business_introduction_volume', title: '业务介绍', sort: true, align: 'center', width: 100,totalRow: true},
-                {field: 'answer_question_volume', title: '解答问题', sort: true, align: 'center', width: 100,totalRow: true},
-                {field: 'contract_pay_volume', title: '约定付款', sort: true, align: 'center', width: 100,totalRow: true},
-                {field: 'quality_error_volume', title: '质检差错数', sort: true, align: 'center', width: 120,totalRow: true},
+                {field: 'return_visit_volume', title: '回访量', align: 'center', width: 100, sort: true, totalRow: true},
+                {field: 'success_opening_volume', title: '成功开场', align: 'center', width: 100, sort: true, totalRow: true},
+                {field: 'business_introduction_volume', title: '业务介绍', sort: true, align: 'center', width: 100, totalRow: true},
+                {field: 'answer_question_volume', title: '解答问题', sort: true, align: 'center', width: 100, totalRow: true},
+                {field: 'contract_pay_volume', title: '约定付款', sort: true, align: 'center', width: 100, totalRow: true},
+                //{field: 'quality_error_volume', title: '质检差错数', sort: true, align: 'center', width: 120, totalRow: true},
                 {fixed: 'right', title: '操作', toolbar: '#tool-right', width: 150, align: 'center'}
             ]],
             page: true,
@@ -216,7 +216,7 @@
                         clickedArr[data[i].id] = i;
                         id.push(data[i].id);
                     }
-                    if(id.length <= 0){
+                    if (id.length <= 0) {
                         layer.msg('请选择要删除的数据', {icon: 2, time: 1000});
                         break;
                     }

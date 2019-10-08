@@ -19,6 +19,7 @@
     <script type="text/javascript" src="../static/js/xadmin.js"></script>
     <script type="text/javascript" src="../static/js/moment.js"></script>
     <script type="text/javascript" src="../static/js/daterangepicker.js"></script>
+    <script type="text/javascript" src="../static/echarts-lib/echarts.min.js"></script>
 
     <!--[if lt IE 9]>
           <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
@@ -75,8 +76,62 @@
                         </div>
                     </div>
                 </div>
-                <div class="layui-card-body ">
-                    <table class="layui-hide" id="statistical-rate" lay-filter="statistical-rate"></table>
+
+
+                <div class="layui-card-body">
+                    <div class="layui-collapse" lay-filter="funnel-chart">
+                        <div class="layui-colla-item">
+                            <h2 id="funnel-chart-title" class="layui-colla-title" style="margin-top: unset;margin-bottom: unset;">收起漏斗图</h2>
+                            <div class="layui-colla-content layui-show layui-row">
+                                <div class="layui-col-md12">
+                                    <div class="layui-card">
+                                        <div class="layui-card-body ">
+                                            <div class="layui-col-md6">
+                                                <ul class="layui-row layui-col-space10 layui-this x-admin-carousel x-admin-backlog">
+                                                    <li class="layui-col-md4 layui-col-xs6">
+                                                        <a href="javascript:;" class="x-admin-backlog-body" style="text-decoration:unset">
+                                                            <h3>成功开场转化率</h3>
+                                                            <p><cite id="person-count"></cite></p>
+                                                        </a>
+                                                    </li>
+                                                    <li class="layui-col-md4 layui-col-xs6">
+                                                        <a href="javascript:;" class="x-admin-backlog-body" style="text-decoration:unset">
+                                                            <h3>业务介绍成功转化率</h3>
+                                                            <p><cite id="group-count"></cite></p>
+                                                        </a>
+                                                    </li>
+                                                    <li class="layui-col-md4 layui-col-xs6">
+                                                        <a href="javascript:;" class="x-admin-backlog-body" style="text-decoration:unset">
+                                                            <h3>解答问题转化率</h3>
+                                                            <p><cite id="development-count"></cite></p>
+                                                        </a>
+                                                    </li>
+                                                    <li class="layui-col-md4 layui-col-xs6">
+                                                        <a href="javascript:;" class="x-admin-backlog-body" style="text-decoration:unset">
+                                                            <h3>约定付款转化率</h3>
+                                                            <p><cite id="return-count"></cite></p>
+                                                        </a>
+                                                    </li>
+                                                    <li class="layui-col-md4 layui-col-xs6">
+                                                        <a href="javascript:;" class="x-admin-backlog-body" style="text-decoration:unset">
+                                                            <h3>成交转化率</h3>
+                                                            <p><cite id="performance-count"></cite></p>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="layui-col-md6">
+                                                <div id="echarts-funnel-data" style="height:500px"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-colla-item">
+                            <table class="layui-hide" id="statistical-rate" lay-filter="statistical-rate"></table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,13 +141,94 @@
 <script>
     var obj_value = 'group';
     var id_value = '';
-    layui.use(['form', 'laydate', 'table'], function () {
+    layui.use(['form', 'laydate', 'table', 'element'], function () {
         var $ = layui.jquery;
         var table = layui.table;
         var laydate = layui.laydate;
         var form = layui.form;
         var formSelects = layui.formSelects;
-        $('#daterange-btn > span:nth-child(1)').html(moment().subtract(6, 'days').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
+        var element = layui.element;
+        var layer = layui.layer;
+
+        // 漏斗图
+        var Chart = echarts.init(document.getElementById('echarts-funnel-data'));
+        option = {
+            title: {
+                text: '转化率 - 漏斗图',
+                subtext: '狗仔队'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c}%"
+            },
+            toolbox: {
+                feature: {
+                    dataView: {readOnly: false},
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            calculable: true,
+            series: [
+                {
+                    name: '转化率 - 漏斗图',
+                    type: 'funnel',
+                    left: '10%',
+                    top: 60,
+                    //x2: 80,
+                    bottom: 60,
+                    width: '80%',
+                    // height: {totalHeight} - y - y2,
+                    min: 0,
+                    max: 100,
+                    minSize: '0%',
+                    maxSize: '100%',
+                    sort: 'descending',
+                    gap: 2,
+                    label: {
+                        show: true,
+                        position: 'inside'
+                    },
+                    labelLine: {
+                        length: 10,
+                        lineStyle: {
+                            width: 1,
+                            type: 'solid'
+                        }
+                    },
+                    itemStyle: {
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    },
+                    emphasis: {
+                        label: {
+                            fontSize: 20
+                        }
+                    },
+                    data: [
+                        {value: 81.25, name: '成功开场转化率'},
+                        {value: 76.92, name: '业务介绍成功转化率'},
+                        {value: 30.0, name: '解答问题转化率'},
+                        {value: 20.0, name: '约定付款转化率'},
+                        {value: 0.0, name: '成交转化率'}
+                    ]
+                }
+            ]
+        };
+        Chart.setOption(option, true);
+
+        //监听折叠
+        element.on('collapse(funnel-chart)', function (data) {
+            console.log(data);
+            if (data.show) {
+                $('#funnel-chart-title').text('收起漏斗图');
+            } else {
+                $('#funnel-chart-title').text('展开漏斗图');
+            }
+            element.render('collapse');
+        });
+
+        $('#daterange-btn > span:nth-child(1)').html(moment().subtract(7, 'days').format('YYYY-MM-DD') + ' - ' + moment().subtract(1, 'days').format('YYYY-MM-DD'));
         $('#daterange-btn > span:nth-child(2)').html('过去七天');
         $('.ranges_1 ul').remove();
         $('#daterange-btn').daterangepicker({
@@ -100,18 +236,18 @@
                     '今天': [moment(), moment()],
                     '昨天': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     '前天': [moment().subtract(2, 'days'), moment().subtract(2, 'days')],
-                    '过去7天': [moment().subtract(6, 'days'), moment()],
-                    '过去14天': [moment().subtract(13, 'days'), moment()],
-                    '过去30天': [moment().subtract(29, 'days'), moment()],
+                    '过去7天': [moment().subtract(7, 'days'), moment().subtract(1, 'days')],
+                    '过去14天': [moment().subtract(14, 'days'), moment().subtract(1, 'days')],
+                    '过去30天': [moment().subtract(30, 'days'), moment().subtract(1, 'days')],
                     '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                    '过去90天': [moment().subtract(89, 'days'), moment()],
-                    '过去半年': [moment().subtract(179, 'days'), moment()],
+                    '过去90天': [moment().subtract(90, 'days'), moment().subtract(1, 'days')],
+                    '过去半年': [moment().subtract(180, 'days'), moment().subtract(1, 'days')],
                     '上周(周日至周六)': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
                     '上周(周一至周日)': [moment().subtract(1, 'week').startOf('week').subtract(-1, 'days'), moment().subtract(1, 'week').endOf('week').subtract(-1, 'days')],
                     '自选': [moment(), [moment(), moment().subtract(-1, 'days')],],
                 },
-                startDate: moment().subtract(6, 'days'),
-                endDate: moment(),
+                startDate: moment().subtract(7, 'days'),
+                endDate: moment().subtract(1, 'days'),
                 maxDate: moment(),
             }, function (start, end, label) {
                 console.log(label);
@@ -156,14 +292,14 @@
             }
         );
 
-        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn span').html();
-
         loadSearchData(); //加载搜索栏数据
         layui.form.render();
         $('.layui-unselect')[1].style.height = '36px';
         laydate.render({
             elem: '#date-range', range: true
         });
+
+        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn span').html();
         table.render({
             elem: '#statistical-rate',
             url: '/api/statistical-rate-data/' + parameter,
