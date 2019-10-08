@@ -30,7 +30,7 @@ class HighSeasDataAdmin(admin.ModelAdmin):
 
 
 class PerformanceDataAdmin(admin.ModelAdmin):
-    list_display = ['id', 'person_id', 'new_addition_volume', 'talkable_volume', 'work_customer_volume', 'transaction_volume', 'data_time', 'date_joined']
+    list_display = ['id', 'person_id', 'new_addition_volume', 'talkable_volume', 'work_customer_volume', 'transaction_volume', 'source', 'data_time', 'date_joined']
     search_fields = ['id']
 
 

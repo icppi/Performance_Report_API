@@ -89,8 +89,8 @@
         var laydate = layui.laydate;
         var form = layui.form;
 
-        $('#daterange-btn > span:nth-child(1)').html(moment().subtract(6, 'days').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
-        $('#daterange-btn > span:nth-child(2)').html('过去七天');
+        $('#daterange-btn > span:nth-child(1)').html(moment().subtract(5, 'years').format('YYYY-MM-DD') + ' - ' + moment().format('YYYY-MM-DD'));
+        $('#daterange-btn > span:nth-child(2)').html('全部日期');
         $('.ranges_1 ul').remove();
         $('#daterange-btn').daterangepicker({
                 ranges: {
@@ -107,8 +107,6 @@
                     '上周(周一至周日)': [moment().subtract(1, 'week').startOf('week').subtract(-1, 'days'), moment().subtract(1, 'week').endOf('week').subtract(-1, 'days')],
                     '自选': [moment(), [moment(), moment().subtract(-1, 'days')],],
                 },
-                startDate: moment().subtract(6, 'days'),
-                endDate: moment(),
                 maxDate: moment(),
             }, function (start, end, label) {
                 console.log(label);

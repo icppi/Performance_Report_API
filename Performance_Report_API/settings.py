@@ -92,6 +92,19 @@ DATABASES = {
         },
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'HOST': '192.168.1.127',
+#         'PORT': '3306',
+#         'NAME': 'performance',
+#         'USER': 'performance',
+#         'PASSWORD': 'PGNjRh3pzfyHhz4B',
+#         'OPTIONS': {
+#             'sql_mode': 'traditional'
+#         },
+#     }
+# }
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
@@ -133,3 +146,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+LANGUAGES = (
+    ('en', ('English')),
+    ('zh-hans', ('中文简体')),
+    ('zh-hant', ('中文繁體')),
+)

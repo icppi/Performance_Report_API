@@ -110,7 +110,7 @@ def panel_api(request):
         return_count = return_data.count()
         performance_count = performance_data.count()
 
-        yesterday_development_data = development_data.filter(data_time=utils.before_n_day(1))
+        yesterday_development_data = development_data.filter(data_time=utils.before_n_day(2))
         yesterday_development_new_volume_list = [item.new_volume for item in yesterday_development_data if item.new_volume is not None]
         yesterday_development_new_volume = np.sum(yesterday_development_new_volume_list)
 
@@ -127,13 +127,23 @@ def panel_api(request):
         else:
             yesterday_development_business_introduction_rate_day = round((yesterday_development_business_introduction_volume / float(yesterday_development_success_opening_volume)), 2)
 
-        yesterday_return_data = return_data.filter(data_time=utils.before_n_day(1))
+        yesterday_return_data = return_data.filter(data_time=utils.before_n_day(2))
         yesterday_return_return_volume_list = [item.return_visit_volume for item in yesterday_return_data if item.return_visit_volume is not None]
         yesterday_return_return_volume = np.sum(yesterday_return_return_volume_list)
 
-        yesterday_performance_data = performance_data.filter(data_time=utils.before_n_day(1))
+        yesterday_performance_data = performance_data.filter(data_time=utils.before_n_day(2))
         yesterday_performance_transaction_volume_list = [item.transaction_volume for item in yesterday_performance_data if item.transaction_volume is not None]
         yesterday_performance_transaction_volume = np.sum(yesterday_performance_transaction_volume_list)
+
+        yesterday_seas_data = high_seas_data.filter(data_time=utils.before_n_day(2))
+        yesterday_seas_volume_list = [item.high_seas_volume for item in yesterday_seas_data if item.high_seas_volume is not None]
+        yesterday_seas_volume = np.sum(yesterday_seas_volume_list)
+
+        yesterday_transaction_volume_all = int(yesterday_development_new_volume) + int(yesterday_return_return_volume) + int(yesterday_seas_volume)
+        if yesterday_transaction_volume_all is None or yesterday_transaction_volume_all == 0:
+            yesterday_transaction_rate_day = 0.0
+        else:
+            yesterday_transaction_rate_day = round((yesterday_performance_transaction_volume / float(yesterday_transaction_volume_all)), 2)
 
         development_success_opening_volume_list_all = [item.success_opening_volume for item in development_data if item.success_opening_volume is not None]
         development_success_opening_volume_all = np.sum(development_success_opening_volume_list_all)
@@ -148,7 +158,7 @@ def panel_api(request):
         development_new_volume_all = [item.new_volume for item in development_data if item.new_volume is not None]
         development_new_volume_all = np.sum(development_new_volume_all)
 
-        development_transaction_value_list = [item.transaction_volume for item in performance_data if item.transaction_volume is not None]
+        development_transaction_value_list = [item.transaction_volume for item in performance_data if item.transaction_volume is not None and item.source == 0]
         development_transaction_volume_all = np.sum(development_transaction_value_list, axis=0)
 
         development_new_customer_volume_list = [item.new_customer_volume for item in development_data if item.new_customer_volume is not None]
@@ -156,6 +166,9 @@ def panel_api(request):
 
         development_pay_volume_list = [item.contract_pay_volume for item in development_data if item.contract_pay_volume is not None]
         development_pay_volume_all = np.sum(development_pay_volume_list, axis=0)
+
+        return_return_transaction_value_list = [item.transaction_volume for item in performance_data if item.transaction_volume is not None and item.source == 1]
+        return_return_transaction_volume_all = np.sum(return_return_transaction_value_list, axis=0)
 
         return_return_visit_volume = [item.return_visit_volume for item in return_data if item.return_visit_volume]
         return_return_visit_volume_all = np.sum(return_return_visit_volume, axis=0)
@@ -190,17 +203,22 @@ def panel_api(request):
                 },
                 'panel': {
                     'yesterday_development_new_volume': str(int(yesterday_development_new_volume)),
-                    'yesterday_development_contract_pay_volume': str(int(yesterday_development_contract_pay_volume)),
                     'yesterday_return_return_volume': str(int(yesterday_return_return_volume)),
+                    'yesterday_seas_volume': str(int(yesterday_seas_volume)),
+                    'yesterday_development_contract_pay_volume': str(int(yesterday_development_contract_pay_volume)),
                     'yesterday_performance_transaction_volume': str(int(yesterday_performance_transaction_volume)),
-                    'development_new_volume_all': str(int(development_new_volume_all)),
                     'yesterday_development_business_introduction_rate_day': str(yesterday_development_business_introduction_rate_day) + '%',
-                    'development_transaction_volume_all': str(development_transaction_volume_all),
-                    'development_new_customer_volume_all': str(development_new_customer_volume_all),
-                    'development_pay_volume_all': str(development_pay_volume_all),
+                    'yesterday_transaction_rate_day': str(yesterday_transaction_rate_day) + '%',
+
+                    'development_new_volume_all': str(int(development_new_volume_all)),
+                    'development_transaction_volume_all': str(int(development_transaction_volume_all)),
+                    'development_new_customer_volume_all': str(int(development_new_customer_volume_all)),
+                    'development_pay_volume_all': str(int(development_pay_volume_all)),
                     'development_business_introduction_rate_all': str(development_business_introduction_rate_all) + '%',
-                    'return_return_visit_volume_all': str(return_return_visit_volume_all),
-                    'return_contract_pay_volume_all': str(return_contract_pay_volume_all),
+
+                    'return_return_visit_volume_all': str(int(return_return_visit_volume_all)),
+                    'return_contract_pay_volume_all': str(int(return_contract_pay_volume_all)),
+                    'return_return_transaction_volume_all': str(int(return_return_transaction_volume_all)),
                     'return_business_introduction_rate_all': str(return_business_introduction_rate_all) + '%',
                 }
             }
@@ -621,8 +639,11 @@ def development_data_api(request):
             development_data = development_data.filter(person_id__in=persons)
 
         if date_range is not None and date_range != '' and date_range != 'undefined':
-            start = str(date_range).split(' - ')[0]
-            end = str(date_range).split(' - ')[1]
+            try:
+                start = str(date_range).split(' - ')[0]
+                end = str(date_range).split(' - ')[1]
+            except:
+                start = end = str(date_range)
             if start is not None and start != '' and end is not None and end != '':
                 start = utils.parse_ymd(start + ' 00:00:00')
                 end = utils.parse_ymd(end + ' 23:59:59')
@@ -777,8 +798,7 @@ def return_data_api(request):
                 start = str(date_range).split(' - ')[0]
                 end = str(date_range).split(' - ')[1]
             except:
-                start = str(date_range)
-                end = str(date_range)
+                start = end = str(date_range)
             if start is not None and start != '' and end is not None and end != '':
                 start = utils.parse_ymd(start + ' 00:00:00')
                 end = utils.parse_ymd(end + ' 23:59:59')
@@ -932,8 +952,7 @@ def high_seas_data_api(request):
                 start = str(date_range).split(' - ')[0]
                 end = str(date_range).split(' - ')[1]
             except:
-                start = str(date_range)
-                end = str(date_range)
+                start = end = str(date_range)
             if start is not None and start != '' and end is not None and end != '':
                 start = utils.parse_ymd(start + ' 00:00:00')
                 end = utils.parse_ymd(end + ' 23:59:59')
@@ -1081,8 +1100,7 @@ def performance_data_api(request):
                 start = str(date_range).split(' - ')[0]
                 end = str(date_range).split(' - ')[1]
             except:
-                start = str(date_range)
-                end = str(date_range)
+                start = end = str(date_range)
             if start is not None and start != '' and end is not None and end != '':
                 start = utils.parse_ymd(start + ' 00:00:00')
                 end = utils.parse_ymd(end + ' 23:59:59')
@@ -1122,6 +1140,7 @@ def performance_data_api(request):
         return JsonResponse(status=status.HTTP_200_OK, data=data)
 
 
+# 报表统计
 @exception(logger)
 def data_conversion_rate(request):
     if request.method == 'GET':
@@ -1154,8 +1173,7 @@ def data_conversion_rate(request):
                 start = str(date_range).split(' - ')[0]
                 end = str(date_range).split(' - ')[1]
             except:
-                start = str(date_range)
-                end = str(date_range)
+                start = end = str(date_range)
             if start is not None and start != '' and end is not None and end != '':
                 start = utils.parse_ymd(start + ' 00:00:00')
                 end = utils.parse_ymd(end + ' 23:59:59')
@@ -1170,15 +1188,16 @@ def data_conversion_rate(request):
         else:
             if types is not None and types != 'undefined':
                 # 若未选择日期则默认前7天数据
-                date_range = '{} - {}'.format(utils.before_n_day(7), utils.before_n_day(1))
-                data = data.filter(data_time__range=(utils.before_n_day(7), utils.before_n_day(1)))
-                performance_data = performance_data.filter(data_time__range=(utils.before_n_day(7), utils.before_n_day(1)))
+                date_range = '{} - {}'.format(utils.before_n_day(8), utils.before_n_day(2))
+                data = data.filter(data_time__range=(utils.before_n_day(8), utils.before_n_day(2)))
+                performance_data = performance_data.filter(data_time__range=(utils.before_n_day(8), utils.before_n_day(2)))
 
                 # 同期对比数据
-                same_period_data = same_period_data.filter(data_time__range=(utils.before_n_day(14), utils.before_n_day(8)))
-                same_period_performance_data = same_period_performance_data.filter(data_time__range=(utils.before_n_day(14), utils.before_n_day(8)))
+                same_period_data = same_period_data.filter(data_time__range=(utils.before_n_day(15), utils.before_n_day(9)))
+                same_period_performance_data = same_period_performance_data.filter(data_time__range=(utils.before_n_day(15), utils.before_n_day(9)))
 
-        if data.__len__() <= 0 or performance_data.__len__() <= 0:
+        # if data.__len__() <= 0 or performance_data.__len__() <= 0:
+        if data.__len__() <= 0:
             return JsonResponse(status=status.HTTP_200_OK, data={
                 'code': 200,
                 'msg': '该时间段内没有数据哦！'
@@ -1494,7 +1513,10 @@ def data_conversion_rate(request):
                     same_period_per_data_lists = []
 
                     for same_period_per_item in same_period_performance_data_list[same_period_list_count]:
-                        same_period_transaction_volume = same_period_per_item.transaction_volume
+                        if same_period_per_item.source == 1:
+                            same_period_transaction_volume = same_period_per_item.transaction_volume
+                        else:
+                            same_period_transaction_volume = 0
                         if same_period_transaction_volume is None:
                             same_period_transaction_volume = 0
                         same_period_per_data_lists.append(same_period_transaction_volume)
@@ -1878,18 +1900,18 @@ def top_data_api(request):
             start = str(date_range).split(' - ')[0]
             end = str(date_range).split(' - ')[1]
         except:
-            start = str(date_range)
-            end = str(date_range)
+            start = end = str(date_range)
         if start is not None and start != '' and end is not None and end != '':
             start = utils.parse_ymd(start + ' 00:00:00')
             end = utils.parse_ymd(end + ' 23:59:59')
-            development_data = development_data.filter(data_time__in=(start, end))
-            return_data = return_data.filter(data_time__in=(start, end))
-            performance_data = performance_data.filter(data_time__in=(start, end))
+            development_data = development_data.filter(data_time__range=(start, end))
+            return_data = return_data.filter(data_time__range=(start, end))
+            performance_data = performance_data.filter(data_time__range=(start, end))
         else:
-            development_data = development_data.filter(data_time__in=(utils.before_n_day(7), utils.before_n_day(1)))
-            return_data = return_data.filter(data_time__in=(utils.before_n_day(7), utils.before_n_day(1)))
-            performance_data = performance_data.filter(data_time__in=(utils.before_n_day(7), utils.before_n_day(1)))
+            development_data = development_data.filter(data_time__range=(utils.before_n_day(8), utils.before_n_day(2)))
+            return_data = return_data.filter(data_time__range=(utils.before_n_day(8), utils.before_n_day(2)))
+            performance_data = performance_data.filter(data_time__range=(utils.before_n_day(8), utils.before_n_day(2)))
+        print(performance_data)
 
     return_person_dev_list = []
     return_person_return_list = []
@@ -1951,15 +1973,30 @@ def top_data_api(request):
         item['business_rate'] = str(item['business_rate']) + '%'
         item['ranking'] = int(index) + 1
 
+    if development_data.__len__() <= 0:
+        ret_new = []
+    else:
+        ret_new = return_person_dev_list[:num]
+
+    if return_data.__len__() <= 0:
+        ret_return = []
+    else:
+        ret_return = return_person_return_list[:num]
+
+    if performance_data.__len__() <= 0:
+        ret_transaction = []
+    else:
+        ret_transaction = return_person_performance_list[:num]
+
     return JsonResponse(status=status.HTTP_200_OK,
                         data={'code': 0,
                               'msg': 'success',
                               'count': 10,
                               'data':
                                   {
-                                      'ret_new': return_person_dev_list[:num],
-                                      'ret_return': return_person_return_list[:num],
+                                      'ret_new': ret_new,
+                                      'ret_return': ret_return,
                                       'ret_rate': return_person_rate_list[:num],
-                                      'ret_transaction': return_person_performance_list[:num],
+                                      'ret_transaction': ret_transaction,
                                   }
                               })

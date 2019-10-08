@@ -24,7 +24,7 @@
             <div class="layui-card">
                 <div class="layui-card-body ">
                     <blockquote class="layui-elem-quote">欢迎管理员：
-                        <span class="x-red">{% if user.username == '' %}未登录{% else %}{{ user.username|upper }}{% endif %}</span> ！ 当前时间 : <span id="time"></span>
+                        <span class="x-red">{% if user.username == '' %}未登录{% else %}{{ user.username|upper }}{% endif %}</span> ！ 登录时间 : <span id="time"></span>
                     </blockquote>
                 </div>
             </div>
@@ -49,6 +49,12 @@
                         </li>
                         <li class="layui-col-md2 layui-col-xs6">
                             <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>公海量</h3>
+                                <p><cite id="seas_value_day"></cite></p>
+                            </a>
+                        </li>
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
                                 <h3>约定付款数</h3>
                                 <p><cite id="pay_value_day"></cite></p>
                             </a>
@@ -65,7 +71,12 @@
                                 <p><cite id="yesterday_development_business_introduction_rate_day"></cite></p>
                             </a>
                         </li>
-
+                        <li class="layui-col-md2 layui-col-xs6">
+                            <a href="javascript:;" class="x-admin-backlog-body">
+                                <h3>日平均成交率</h3>
+                                <p><cite id="yesterday_transaction_rate_day"></cite></p>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -131,7 +142,7 @@
                             <li class="layui-col-md2 layui-col-xs6">
                                 <a href="javascript:;" class="x-admin-backlog-body">
                                     <h3>成交数</h3>
-                                    <p><cite id="return_transaction_volume_all"></cite></p>
+                                    <p><cite id="return_return_transaction_volume_all"></cite></p>
                                 </a>
                             </li>
                             <li class="layui-col-md2 layui-col-xs6">
@@ -248,8 +259,10 @@
                     $('#new_value_day').html(data.data.panel.yesterday_development_new_volume);
                     $('#return_value_day').html(data.data.panel.yesterday_return_return_volume);
                     $('#pay_value_day').html(data.data.panel.yesterday_development_contract_pay_volume);
+                    $('#seas_value_day').html(data.data.panel.yesterday_seas_volume);
                     $('#transaction_value_day').html(data.data.panel.yesterday_performance_transaction_volume);
                     $('#yesterday_development_business_introduction_rate_day').html(data.data.panel.yesterday_development_business_introduction_rate_day);
+                    $('#yesterday_transaction_rate_day').html(data.data.panel.yesterday_transaction_rate_day);
 
                     $('#development_new_customer_volume_all').html(data.data.panel.development_new_customer_volume_all);
                     $('#development_pay_volume_all').html(data.data.panel.development_pay_volume_all);
@@ -257,10 +270,9 @@
                     $('#development_new_volume_all').html(data.data.panel.development_new_volume_all);
                     $('#development_business_introduction_rate_all').html(data.data.panel.development_business_introduction_rate_all);
 
-                    $('#return_transaction_volume_all').html(data.data.panel.development_transaction_volume_all);
-
                     $('#return_pay_volume_all').html(data.data.panel.return_contract_pay_volume_all);
                     $('#return_return_volume_all').html(data.data.panel.return_return_visit_volume_all);
+                    $('#return_return_transaction_volume_all').html(data.data.panel.return_return_transaction_volume_all);
                     $('#return_business_introduction_rate_all').html(data.data.panel.return_business_introduction_rate_all);
 
                 } else {
