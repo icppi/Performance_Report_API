@@ -27,6 +27,7 @@ urlpatterns = [
     path('return-data/', views.return_data_api),
     path('high-seas-data/', views.high_seas_data_api),
     path('performance-data/', views.performance_data_api),
+    path('transfer-performance-data/', views.transfer_performance_data_api),
 
     # 数据计算
     path('statistical-rate-data/', views.data_conversion_rate),

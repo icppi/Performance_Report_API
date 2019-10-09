@@ -45,6 +45,7 @@
                                 <option disabled>数据源</option>
                                 <option value="development" selected>新增数据</option>
                                 <option value="return">回访数据</option>
+                                <option value="highseas">公海数据</option>
                             </select>
                         </div>
 
@@ -418,7 +419,7 @@
                     {field: 'per_data_sum', title: '成交量', sort: true, align: 'center', width: 140},
                 ]],
             });
-        } else {
+        } else if ($('#data-source').val() === 'return') {
 
             layui.table.render({
                 elem: '#statistical-rate',
@@ -438,6 +439,44 @@
                     {field: 'date', title: '日期', width: 200, fixed: 'left', unresize: true, sort: true, align: 'center'},
                     {field: 'name', title: '组/花名', width: 120, fixed: 'left', unresize: true, sort: true, align: 'center'},
                     {field: 'return_visit_volume', title: '回访量', align: 'center', width: 140, sort: true},
+                    {field: 'success_opening_rate', title: '成功开场率', align: 'center', width: 140, sort: true},
+                    {field: 'business_introduction_rate', title: '业务介绍成功率', sort: true, align: 'center', width: 140},
+                    {field: 'answer_question_rate', title: '解答问题率', sort: true, align: 'center', width: 140},
+                    {field: 'contract_pay_rate', title: '约定付款率', sort: true, align: 'center', width: 140},
+                    {field: 'transaction_rate', title: '成交率', sort: true, align: 'center', width: 140},
+                    {field: 'per_data_sum', title: '成交量', sort: true, align: 'center', width: 140}
+                ]],
+                page: true,
+                limit: 20,
+                parseData: function (res) {
+                    return {
+                        "code": res.code,
+                        "msg": res.msg,
+                        "count": res.count,
+                        "data": res.data
+                    };
+                }
+            });
+        }else{
+
+            layui.table.render({
+                elem: '#statistical-rate',
+                url: '/api/statistical-rate-data/' + parameter,
+                toolbar: '#tool-top',
+                defaultToolbar: [
+                    'filter', 'exports', 'print', {
+                        title: '提示',
+                        layEvent: 'LAYTABLE_TIPS',
+                        icon: 'layui-icon-tips'
+                    }
+                ],
+                cellMinWidth: 80,
+                height: 'full-200',
+                title: '回访数据统计',
+                cols: [[
+                    {field: 'date', title: '日期', width: 200, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                    {field: 'name', title: '组/花名', width: 120, fixed: 'left', unresize: true, sort: true, align: 'center'},
+                    {field: 'high_seas_volume', title: '公海客户量', align: 'center', width: 140, sort: true},
                     {field: 'success_opening_rate', title: '成功开场率', align: 'center', width: 140, sort: true},
                     {field: 'business_introduction_rate', title: '业务介绍成功率', sort: true, align: 'center', width: 140},
                     {field: 'answer_question_rate', title: '解答问题率', sort: true, align: 'center', width: 140},

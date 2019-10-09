@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.urls import path
-from API.Report.views import top_view, login_view, index_view, panel_view, user_view, group_view, development_data_view, performance_data_view, return_data_view, statistical_rate_view, statistical_echarts_view, high_seas_data_view
+from API.Report.views import transfer_performance_data_view,top_view, login_view, index_view, panel_view, user_view, group_view, development_data_view, performance_data_view, return_data_view, statistical_rate_view, statistical_echarts_view, high_seas_data_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,6 +29,7 @@ urlpatterns = [
     path('group/', group_view),
     path('development-data/', development_data_view),
     path('performance-data/', performance_data_view),
+    path('transfer-performance-data/', transfer_performance_data_view),
     path('return-data/', return_data_view),
     path('high-seas-data/', high_seas_data_view),
     path('statistical-rate/', statistical_rate_view),

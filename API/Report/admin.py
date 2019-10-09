@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from API.Report.models import GroupModel, PersonModel, DevelopmentDataModel, ReturnDataModel, PerformanceDataModel, HighSeasDataModel
+from API.Report.models import GroupModel, PersonModel, DevelopmentDataModel, ReturnDataModel, PerformanceDataModel, HighSeasDataModel, TransferPerformanceDataModel
 
 
 class GroupAdmin(admin.ModelAdmin):
@@ -34,9 +34,15 @@ class PerformanceDataAdmin(admin.ModelAdmin):
     search_fields = ['id']
 
 
+class TransferPerformanceDataAdmin(admin.ModelAdmin):
+    list_display = ['id', 'person_id', 'development_volume', 'transfer_volume', 'data_time', 'date_joined']
+    search_fields = ['id']
+
+
 admin.site.register(GroupModel, GroupAdmin)
 admin.site.register(PersonModel, PersonAdmin)
 admin.site.register(DevelopmentDataModel, DevelopmentDataAdmin)
 admin.site.register(ReturnDataModel, ReturnDataAdmin)
 admin.site.register(PerformanceDataModel, PerformanceDataAdmin)
 admin.site.register(HighSeasDataModel, HighSeasDataAdmin)
+admin.site.register(TransferPerformanceDataModel, TransferPerformanceDataAdmin)
