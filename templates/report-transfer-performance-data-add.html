@@ -2,7 +2,7 @@
 <html class="x-admin-sm">
 <head>
     <meta charset="UTF-8">
-    <title>业务报表系统 - 添加回访数据</title>
+    <title>业务报表系统 - 添加转接绩效数据</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     {# <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>#}
@@ -29,41 +29,16 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label for="return-visit-volume" class="layui-form-label">
-                    回访量</label>
+                <label for="development_volume" class="layui-form-label">
+                    开发量</label>
                 <div class="layui-input-inline">
-                    <input type="number" id="return-visit-volume" name="return-visit-volume" class="layui-input" lay-verify="numberOrEmpty"></div>
+                    <input type="number" id="development_volume" name="development_volume" class="layui-input" lay-verify="numberOrEmpty"></div>
             </div>
             <div class="layui-form-item">
-                <label for="successful-opening" class="layui-form-label">
-                    成功开场</label>
+                <label for="transfer_volume" class="layui-form-label">
+                    转接量</label>
                 <div class="layui-input-inline">
-                    <input type="number" id="successful-opening" name="successful-opening" class="layui-input" lay-verify="numberOrEmpty"></div>
-            </div>
-            <div class="layui-form-item">
-                <label for="business-introduction" class="layui-form-label">
-                    业务介绍</label>
-                <div class="layui-input-inline">
-                    <input type="number" id="business-introduction" name="business-introduction" class="layui-input" lay-verify="numberOrEmpty"></div>
-            </div>
-            <div class="layui-form-item">
-                <label for="answer-questions" class="layui-form-label">
-                    解答问题</label>
-                <div class="layui-input-inline">
-                    <input type="number" id="answer-questions" name="answer-questions" class="layui-input" lay-verify="numberOrEmpty"></div>
-            </div>
-            <div class="layui-form-item">
-                <label for="contract-payment" class="layui-form-label">
-                    约定付款</label>
-                <div class="layui-input-inline">
-                    <input type="number" id="contract-payment" name="contract-payment" class="layui-input" lay-verify="numberOrEmpty"></div>
-            </div>
-
-            <div class="layui-form-item">
-                <label for="quality-error" class="layui-form-label">
-                    质检差错数</label>
-                <div class="layui-input-inline">
-                    <input type="number" id="quality-error" name="quality-error" class="layui-input" lay-verify="numberOrEmpty"></div>
+                    <input type="number" id="transfer_volume" name="transfer_volume" class="layui-input" lay-verify="numberOrEmpty"></div>
             </div>
             <div class="layui-form-item">
                 <label for="data-date" class="layui-form-label">
@@ -141,58 +116,23 @@
         xadmin.close();
         parent.layui.layer.open({
             type: 2,
-            title: '添加回访数据',
-            content: ['/api/return-data/?event=add' + search_value],
-            area: ['460px', '600px']
-        });
-    }
-
-    function add() {
-        $.ajax({
-            url: '/api/return-data/',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                'operating': 'add',
-                'person_id': $('#username').val(),
-                'return_visit_volume': $('#return-visit-volume').val(),
-                'success_opening_volume': $('#successful-opening').val(),
-                'business_introduction_volume': $('#business-introduction').val(),
-                'answer_question_volume': $('#answer-questions').val(),
-                'contract_pay_volume': $('#contract-payment').val(),
-                'quality_error_volume': $('#quality-error').val(),
-                'data_time': $('#data-date').val(),
-            },
-            error: function (error) {
-                layer.alert('网络连接错误', {icon: 2, time: 1000});
-            },
-            success: function (data) {
-                if (data.code === 0) {
-                    layer.msg(data.msg, {icon: 6, time: 1000},
-                        function () {
-                            console.log('{{ search }}');
-                        });
-                } else {
-                    layer.msg(data.msg, {icon: 2, time: 1000});
-                }
-            }
+            title: '添加新增数据',
+            content: ['/api/transfer-performance-data/?event=add' + search_value],
+            area: ['460px', '400px']
         });
     }
 
     function add_btn() {
         $.ajax({
-            url: '/api/return-data/',
+            url: '/api/transfer-performance-data/',
             type: 'POST',
             dataType: 'json',
             data: {
                 'operating': 'add',
                 'person_id': $('#username').val(),
-                'return_visit_volume': $('#return-visit-volume').val(),
-                'success_opening_volume': $('#successful-opening').val(),
-                'business_introduction_volume': $('#business-introduction').val(),
-                'answer_question_volume': $('#answer-questions').val(),
-                'contract_pay_volume': $('#contract-payment').val(),
-                'quality_error_volume': $('#quality-error').val(),
+                'development_volume': $('#development_volume').val(),
+                'transfer_volume': $('#transfer_volume').val(),
+                'source': $('#data-source').val(),
                 'data_time': $('#data-date').val(),
             },
             error: function (error) {
@@ -204,9 +144,38 @@
                         function () {
                             console.log('{{ search }}');
                             xadmin.close();
-                            parent.layui.table.reload('return-data', {
-                                url: '/api/return-data/?person_id={{ search.person_id }}&group_id={{ search.group_id }}&date_range={{ search.date_range }}',
+                            parent.layui.table.reload('performance-data', {
+                                url: '/api/transfer-performance-data/?person_id={{ search.person_id }}&group_id={{ search.group_id }}&date_range={{ search.date_range }}',
                             });
+                        });
+                } else {
+                    layer.msg(data.msg, {icon: 2, time: 1000});
+                }
+            }
+        });
+    }
+
+    function add() {
+        $.ajax({
+            url: '/api/transfer-performance-data/',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                'operating': 'add',
+                'person_id': $('#username').val(),
+                'development_volume': $('#development_volume').val(),
+                'transfer_volume': $('#transfer_volume').val(),
+                'data_time': $('#data-date').val(),
+            },
+            error: function (error) {
+                layer.alert('网络连接错误', {icon: 2, time: 1000});
+            },
+            success: function (data) {
+                if (data.code === 0) {
+                    layer.msg(data.msg, {icon: 6, time: 1000},
+                        function () {
+                            console.log('{{ search }}');
+
                             //xadmin.father_reload();
                         });
                 } else {

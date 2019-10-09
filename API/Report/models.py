@@ -18,7 +18,7 @@ class PersonModel(models.Model):
     username = models.CharField(max_length=250, null=True, blank=None, verbose_name='花名')
     actual_name = models.CharField(max_length=250, null=True, blank=None, verbose_name='真实姓名')
     group_id = models.ForeignKey(to=GroupModel, on_delete=models.CASCADE, to_field='id', verbose_name='团队组ID')
-    status = models.BooleanField(null=True, blank=False, verbose_name='新老员工状态')
+    status = models.IntegerField(choices={(0, '老员工'), (1, '新员工'), (2, '离职')}, default=0, verbose_name='员工状态')
     date_joined = models.DateTimeField(default=timezone.now, verbose_name='创建日期')
 
     class Meta:
@@ -97,3 +97,16 @@ class PerformanceDataModel(models.Model):
         db_table = 'Report_PerformanceData'
         ordering = ['-id', '-data_time', '-date_joined']
         verbose_name = verbose_name_plural = '绩效数据表'
+
+
+class TransferPerformanceDataModel(models.Model):
+    person_id = models.ForeignKey(to=PersonModel, on_delete=models.CASCADE, to_field='id', verbose_name='成员ID')
+    development_volume = models.IntegerField(null=True, blank=True, default=0, verbose_name='开发量')
+    transfer_volume = models.IntegerField(null=True, blank=True, default=0, verbose_name='转接量')
+    data_time = models.DateField(default=timezone.now, verbose_name='数据日期')
+    date_joined = models.DateTimeField(default=timezone.now, verbose_name='创建日期')
+
+    class Meta:
+        db_table = 'Report_Transfer_PerformanceData'
+        ordering = ['-id', '-data_time', '-date_joined']
+        verbose_name = verbose_name_plural = '转接绩效数据表'

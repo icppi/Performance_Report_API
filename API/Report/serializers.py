@@ -11,7 +11,7 @@
 
 
 from rest_framework import serializers
-from API.Report.models import PersonModel, GroupModel, DevelopmentDataModel, ReturnDataModel, PerformanceDataModel, HighSeasDataModel
+from API.Report.models import PersonModel, GroupModel, DevelopmentDataModel, ReturnDataModel, PerformanceDataModel, HighSeasDataModel, TransferPerformanceDataModel
 
 
 class PersonSerializer(serializers.ModelSerializer):
@@ -47,6 +47,12 @@ class PerformanceDataSerializer(serializers.ModelSerializer):
         model = PerformanceDataModel
         fields = "__all__"
         # depth = 2
+
+
+class TransferPerformanceDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransferPerformanceDataModel
+        fields = "__all__"
 
 
 class HighSeasDataSerializer(serializers.ModelSerializer):

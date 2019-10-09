@@ -27,9 +27,11 @@
                 <div class="layui-input-inline">
                     <input type="text" id="username" name="username" required="" lay-verify="required" autocomplete="off" class="layui-input">
                 </div>
+                <!--
                 <div class="layui-form-mid layui-word-aux">
-                    <span class="x-red">*</span>请确保花名的唯一性
+                    <span class="x-red">*</span>请保持花名唯一性
                 </div>
+                -->
             </div>
             <div class="layui-form-item">
                 <label for="actual-name" class="layui-form-label">
@@ -56,8 +58,8 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">状态</label>
                 <div class="layui-input-block">
-                    <input type="radio" name="status" value="0" title="老员工" checked>
-                    <input type="radio" name="status" value="1" title="新员工">
+                    <input lay-filter="gis" type="radio" name="status" value="0" title="老员工" checked>
+                    <input lay-filter="gis" type="radio" name="status" value="1" title="新员工">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -71,7 +73,26 @@
 <script>
     layui.use(['form', 'layer'], function () {
         $ = layui.jquery;
-        var form = layui.form, layer = layui.layer;
+        var form = layui.form;
+        var val = $("#username").val();
+        var pattern = /(离职)/g;
+        form.on('radio(gis)', function (data) {
+            if (data.value === '2') {
+                if (pattern.test(val)) {
+                    $("#username").val(val);
+                } else {
+                    $("#username").val(val + "(离职)");
+                }
+            } else {
+                if (pattern.test(val)) {
+                    $("#username").val(val.substring(0, val.length - 4));
+                    val = $("#username").val();
+                } else {
+                    $("#username").val(val);
+                }
+            }
+        });
+        layui.form.render();
     });
 
     function add() {
