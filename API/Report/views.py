@@ -1,5 +1,6 @@
 import datetime
 import json
+import re
 
 import numpy as np
 from API.exception_logger import logger
@@ -396,8 +397,11 @@ def person_data_api(request):
             persons = persons.filter(group_id_id=group)
 
         if date_range is not None and date_range != '' and date_range != 'undefined':
-            start = str(date_range).split(' - ')[0]
-            end = str(date_range).split(' - ')[1]
+            try:
+                start = str(date_range).split(' - ')[0]
+                end = str(date_range).split(' - ')[1]
+            except Exception as e:
+                start = end = str(date_range)
             if start is not None and start != '' and end is not None and end != '':
                 start = utils.parse_ymd(start + ' 00:00:00')
                 end = utils.parse_ymd(end + ' 23:59:59')
@@ -1337,8 +1341,10 @@ def data_conversion_rate(request):
         # if data.__len__() <= 0 or performance_data.__len__() <= 0:
         if data.__len__() <= 0:
             return JsonResponse(status=status.HTTP_200_OK, data={
-                'code': 200,
-                'msg': '该时间段内没有数据哦！'
+                "code": 0,
+                "msg": "success",
+                "count": 0,
+                "data": []
             })
 
         if id is not None and id != '' and id != 'undefined' and id != '[]':
@@ -1379,6 +1385,7 @@ def data_conversion_rate(request):
                     same_period_performance_data_list.append(same_period_performance_data.filter(person_id=index))
 
         item_list = []
+        echarts_list = []
         if types == 'development':
             # 同期数据
             same_period_rate_list = []
@@ -1628,18 +1635,35 @@ def data_conversion_rate(request):
                     'transaction_rate': str(transaction_rate),
                     'per_data_sum': str(per_data_sum),
                 }
+
+                rex = re.compile(r'(.*?)[%]', re.S)
+                echarts_data = {
+                    'success_opening_rate': float(re.findall(rex, success_opening_rate)[0]),
+                    'business_introduction_rate': float(re.findall(rex, business_introduction_rate)[0]),
+                    'answer_question_rate': float(re.findall(rex, answer_question_rate)[0]),
+                    'contract_pay_rate': float(re.findall(rex, contract_pay_rate)[0]),
+                    'transaction_rate': float(re.findall(rex, transaction_rate)[0]),
+                }
                 if obj == 'group':
-                    res_data.setdefault('name', GroupModel.objects.get(id=id_list[list_count]).group_name)
+                    group_name = GroupModel.objects.get(id=id_list[list_count]).group_name
+                    res_data.setdefault('name', group_name)
+                    echarts_data.setdefault('name', group_name)
                 if obj == 'person':
-                    res_data.setdefault('name', PersonModel.objects.get(id=id_list[list_count]).username)
+                    username = PersonModel.objects.get(id=id_list[list_count]).username
+                    res_data.setdefault('name', username)
+                    echarts_data.setdefault('name', username)
                 item_list.append(res_data)
+                echarts_list.append(echarts_data)
                 list_count += 1
 
             return JsonResponse(status=status.HTTP_200_OK, data={
                 'code': 0,
                 'msg': 'success',
                 'count': item_list.__len__(),
-                'data': item_list[(int(page) - 1) * int(limit):int(page) * int(limit)]
+                'data': {
+                    'datasheet': item_list[(int(page) - 1) * int(limit):int(page) * int(limit)],
+                    'echarts': echarts_list[(int(page) - 1) * int(limit):int(page) * int(limit)]
+                }
             })
 
         elif types == 'return':
@@ -1883,7 +1907,10 @@ def data_conversion_rate(request):
                 'code': 0,
                 'msg': 'success',
                 'count': item_list.__len__(),
-                'data': item_list[(int(page) - 1) * int(limit):int(page) * int(limit)]
+                'data': {
+                    'datasheet': item_list[(int(page) - 1) * int(limit):int(page) * int(limit)],
+                    'echarts': 'echarts'
+                }
             }
             return JsonResponse(status=status.HTTP_200_OK, data=rows)
 
@@ -2124,7 +2151,10 @@ def data_conversion_rate(request):
                 'code': 0,
                 'msg': 'success',
                 'count': item_list.__len__(),
-                'data': item_list[(int(page) - 1) * int(limit):int(page) * int(limit)]
+                'data': {
+                    'datasheet': item_list[(int(page) - 1) * int(limit):int(page) * int(limit)],
+                    'echarts': 'echarts'
+                }
             }
             return JsonResponse(status=status.HTTP_200_OK, data=rows)
 
@@ -2173,18 +2203,23 @@ def statistical_echarts_data(request):
             if start is not None and start != '' and end is not None and end != '':
                 date_list = utils.getEveryDay(start, end)
                 if obj == 'person':
-                    person_sum_list = []
+                    person_sum_data = []
                     return_sum_data = []
+                    transaction_sum_data = []
                     for index in id_list:
                         person_sum = []
                         return_sum_list = []
+                        transaction_sum_list = []
                         for item_date in date_list:
                             development_data = DevelopmentDataModel.objects.filter(data_time=item_date)
                             return_data = ReturnDataModel.objects.filter(data_time=item_date)
+                            transaction_data = PerformanceDataModel.objects.filter(data_time=item_date)
                             person_sum.append(int(np.sum([int(item.new_customer_volume) for item in development_data.filter(person_id=index) if item.new_customer_volume is not None], axis=0)))
                             return_sum_list.append(int(np.sum([int(item.return_visit_volume) for item in return_data.filter(person_id=index) if item.return_visit_volume is not None], axis=0)))
-                        person_sum_list.append(person_sum)
+                            transaction_sum_list.append(int(np.sum([int(item.transaction_volume) for item in transaction_data.filter(person_id=index) if item.transaction_volume is not None], axis=0)))
+                        person_sum_data.append(person_sum)
                         return_sum_data.append(return_sum_list)
+                        transaction_sum_data.append(transaction_sum_list)
                     ret1 = [{'name': name[index],
                              'data': item,
                              'type': 'line',
@@ -2194,7 +2229,7 @@ def statistical_echarts_data(request):
                                      'show': 'true',
                                      'position': 'top'
                                  }
-                             }, } for index, item in enumerate(person_sum_list)]
+                             }, } for index, item in enumerate(person_sum_data)]
                     ret2 = [{'name': name[index],
                              'data': item,
                              'type': 'line',
@@ -2205,6 +2240,16 @@ def statistical_echarts_data(request):
                                      'position': 'top'
                                  }
                              }, } for index, item in enumerate(return_sum_data)]
+                    ret3 = [{'name': name[index],
+                             'data': item,
+                             'type': 'line',
+                             'stack': '总量',
+                             'label': {
+                                 'normal': {
+                                     'show': 'true',
+                                     'position': 'top'
+                                 }
+                             }, } for index, item in enumerate(transaction_sum_data)]
                     ret_data1 = {
                         'legend': name,
                         'xAxis_data': date_list,
@@ -2215,22 +2260,32 @@ def statistical_echarts_data(request):
                         'xAxis_data': date_list,
                         'series': ret2
                     }
-                    return JsonResponse(status=status.HTTP_200_OK, data={'code': 0, 'msg': 'success', 'data': {'new': ret_data1, 'return': ret_data2}})
+                    ret_data3 = {
+                        'legend': name,
+                        'xAxis_data': date_list,
+                        'series': ret3
+                    }
+                    return JsonResponse(status=status.HTTP_200_OK, data={'code': 0, 'msg': 'success', 'data': {'new': ret_data1, 'return': ret_data2, 'transaction': ret_data3}})
 
                 if obj == 'group':
                     sum_data = []
                     return_sum_data = []
+                    transaction_sum_data = []
                     for index in id_list:
                         sum_list = []
                         return_sum_list = []
+                        transaction_sum_list = []
                         for item_date in date_list:
                             return_data = ReturnDataModel.objects.filter(data_time=item_date)
                             development_data = DevelopmentDataModel.objects.filter(data_time=item_date)
+                            transaction_data = PerformanceDataModel.objects.filter(data_time=item_date)
                             person = PersonModel.objects.filter(group_id=index)
                             sum_list.append(int(np.sum([int(item.new_customer_volume) for item in development_data.filter(person_id__in=person) if item.new_customer_volume is not None], axis=0)))
                             return_sum_list.append(int(np.sum([int(item.return_visit_volume) for item in return_data.filter(person_id__in=person) if item.return_visit_volume is not None], axis=0)))
+                            transaction_sum_list.append(int(np.sum([int(item.transaction_volume) for item in transaction_data.filter(person_id__in=person) if item.transaction_volume is not None], axis=0)))
                         sum_data.append(sum_list)
                         return_sum_data.append(return_sum_list)
+                        transaction_sum_data.append(transaction_sum_list)
                     ret1 = [{'name': name[index],
                              'data': item,
                              'type': 'line',
@@ -2251,6 +2306,16 @@ def statistical_echarts_data(request):
                                      'position': 'top'
                                  }
                              }, } for index, item in enumerate(return_sum_data)]
+                    ret3 = [{'name': name[index],
+                             'data': item,
+                             'type': 'line',
+                             'stack': '总量',
+                             'label': {
+                                 'normal': {
+                                     'show': 'true',
+                                     'position': 'top'
+                                 }
+                             }, } for index, item in enumerate(transaction_sum_data)]
                     ret_data1 = {
                         'legend': name,
                         'xAxis_data': date_list,
@@ -2261,7 +2326,12 @@ def statistical_echarts_data(request):
                         'xAxis_data': date_list,
                         'series': ret2
                     }
-                    return JsonResponse(status=status.HTTP_200_OK, data={'code': 0, 'msg': 'success', 'data': {'new': ret_data1, 'return': ret_data2}})
+                    ret_data3 = {
+                        'legend': name,
+                        'xAxis_data': date_list,
+                        'series': ret3
+                    }
+                    return JsonResponse(status=status.HTTP_200_OK, data={'code': 0, 'msg': 'success', 'data': {'new': ret_data1, 'return': ret_data2, 'transaction': ret_data3}})
 
 
 def top_view(request):

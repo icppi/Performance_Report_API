@@ -74,6 +74,9 @@
                 <div class="layui-card-body">
                     <div id="echarts-return-data" style="height:500px;"></div>
                 </div>
+                <div class="layui-card-body">
+                    <div id="echarts-transaction-data" style="height:500px;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -202,7 +205,6 @@
                 }
             });
         }
-
         search_btn();
     });
 
@@ -216,11 +218,14 @@
         console.log(parameter);
         var Chart1 = echarts.init(document.getElementById('echarts-new-data'));
         var Chart2 = echarts.init(document.getElementById('echarts-return-data'));
+        var Chart3 = echarts.init(document.getElementById('echarts-transaction-data'));
         Chart1.showLoading();
         Chart2.showLoading();
+        Chart3.showLoading();
         $.get('/api/statistical-echarts-data/' + parameter).done(function (data) {
             Chart1.hideLoading();
             Chart2.hideLoading();
+            Chart3.hideLoading();
             console.log(data.data);
             option1 = {
                 title: {
@@ -335,6 +340,63 @@
                 series: data.data.return.series
             };
             Chart2.setOption(option2, true);
+
+            option3 = {
+                title: {
+                    text: '成交量 - 趋势图',
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: data.data.transaction.legend
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    show: true,
+                    showTitle: false, // 隐藏默认文字，否则两者位置会重叠
+                    feature: {
+                        magicType: {
+                            type: ['line', 'bar', 'tiled']
+                        },
+                        saveAsImage: {
+                            show: true,
+                            title: '保存为图片'
+                        },
+                        dataView: {
+                            show: true,
+                            title: '数据视图'
+                        },
+                    },
+                    tooltip: { // 和 option.tooltip 的配置项相同
+                        show: true,
+                        formatter: function (param) {
+                            return '<div>' + param.title + '</div>'; // 自定义的 DOM 结构
+                        },
+                        backgroundColor: '#222',
+                        textStyle: {
+                            fontSize: 12,
+                        },
+                        extraCssText: 'box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);' // 自定义的 CSS 样式
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: data.data.transaction.xAxis_data
+                },
+                yAxis: {
+                    type: 'value',
+                    minInterval: 10
+                },
+                series: data.data.transaction.series
+            };
+            Chart3.setOption(option3, true);
         });
     }
 </script>

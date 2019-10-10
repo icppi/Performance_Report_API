@@ -2,34 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7cb8bc3e-35cd-4d6d-9511-d068ec720aa7" name="默认更改列表" comment="">
-<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-=======
-      <change afterPath="$PROJECT_DIR$/static/js/utils.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/report-transfer-performance-data-add.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/report-transfer-performance-data-edit.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/report-transfer-performance-data.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/API/Report/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Performance_Report_API/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Performance_Report_API/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-development-data-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-development-data-add.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-development-data-edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-development-data-edit.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-highseas-data-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-highseas-data-add.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-highseas-data-edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-highseas-data-edit.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-performance-data-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-performance-data-add.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-performance-data-edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-performance-data-edit.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-return-data-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-return-data-add.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/report-return-data-edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/report-return-data-edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/statistical-echarts.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/statistical-echarts.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/statistical-report.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/statistical-report.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/user-add.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/user-add.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/user-edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/user-edit.html" afterDir="false" />
->>>>>>> master
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -204,11 +180,8 @@
       <workItem from="1570452606212" duration="150000" />
       <workItem from="1570496224282" duration="8812000" />
       <workItem from="1570505128667" duration="30416000" />
-<<<<<<< HEAD
-      <workItem from="1570603505675" duration="6471000" />
-=======
-      <workItem from="1570603505675" duration="3512000" />
->>>>>>> master
+      <workItem from="1570603505675" duration="9386000" />
+      <workItem from="1570667998562" duration="18340000" />
     </task>
     <servers />
   </component>
