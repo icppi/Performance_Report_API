@@ -31,10 +31,12 @@ urlpatterns = [
 
     # 数据计算
     path('statistical-rate-data/', views.data_conversion_rate),
+    path('statistical-month-rate-data/', views.data_conversion_month_rate),
     path('statistical-echarts-data/', views.statistical_echarts_data),
 
     # top榜
     path('top-data/', views.top_data_api),
+    path('lifting-data/', views.lifting_list_data),
 
     path('user-login/', views.user_login_api),
     path('user-logout/', views.logout_api),

@@ -79,32 +79,32 @@ WSGI_APPLICATION = 'Performance_Report_API.wsgi.application'
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-        'NAME': 'sys_performance_report_api',
-        'USER': 'root',
-        'PASSWORD': '123456',
-        'OPTIONS': {
-            'sql_mode': 'traditional'
-        },
-    }
-}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'HOST': '192.168.1.127',
+#         'HOST': '127.0.0.1',
 #         'PORT': '3306',
-#         'NAME': 'performance',
-#         'USER': 'performance',
-#         'PASSWORD': 'PGNjRh3pzfyHhz4B',
+#         'NAME': 'sys_performance_report_api',
+#         'USER': 'root',
+#         'PASSWORD': '123456',
 #         'OPTIONS': {
 #             'sql_mode': 'traditional'
 #         },
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '192.168.1.127',
+        'PORT': '3306',
+        'NAME': 'performance',
+        'USER': 'performance',
+        'PASSWORD': 'PGNjRh3pzfyHhz4B',
+        'OPTIONS': {
+            'sql_mode': 'traditional'
+        },
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 

@@ -2,7 +2,7 @@
 <html class="x-admin-sm">
 <head>
     <meta charset="UTF-8">
-    <title>业务报表系统 - 日报表</title>
+    <title>业务报表系统 - 月报表</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     {# <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>#}
@@ -20,6 +20,7 @@
     <script type="text/javascript" src="../static/js/moment.js"></script>
     <script type="text/javascript" src="../static/js/daterangepicker.js"></script>
     <script type="text/javascript" src="../static/echarts-lib/echarts.min.js"></script>
+    <script type="text/javascript" src="../static/js/utils.js"></script>
 
     <!--[if lt IE 9]>
           <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
@@ -29,7 +30,7 @@
 <body>
 <div class="x-nav">
           <span class="layui-breadcrumb">
-            <a href="/index/">首页</a><a><cite>日报表</cite></a>
+            <a href="/index/">首页</a><a><cite>月报表</cite></a>
           </span>
     <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
         <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
@@ -50,14 +51,7 @@
                         </div>
 
                         <div class="layui-inline layui-show-xs-block layui-col-md2" style="width: 10%;">
-                            <button type="button" style="height: 36px" class="layui-btn layui-btn-primary" name="daterange-btn" id="daterange-btn">
-                                <span style="display: none">
-                                </span>
-                                <span>
-                                  <i class="icon iconfont icon-calendar1"></i> 日期选择
-                                </span>
-                                <i class="icon iconfont icon-danxian-youjiantou-copy"></i>
-                            </button>
+                            <button type="button" style="height: 36px" class="layui-btn layui-btn-primary" name="daterange-btn" id="daterange-btn"></button>
                         </div>
 
                         <div class="layui-inline layui-show-xs-block layui-col-md3">
@@ -116,70 +110,14 @@
         var element = layui.element;
         var layer = layui.layer;
         var carousel = layui.carousel;
-
-        $('#daterange-btn > span:nth-child(1)').html(moment().subtract(7, 'days').format('YYYY-MM-DD') + ' - ' + moment().subtract(1, 'days').format('YYYY-MM-DD'));
-        $('#daterange-btn > span:nth-child(2)').html('过去七天');
-        $('.ranges_1 ul').remove();
-        $('#daterange-btn').daterangepicker({
-                ranges: {
-                    '今天': [moment(), moment()],
-                    '昨天': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                    '前天': [moment().subtract(2, 'days'), moment().subtract(2, 'days')],
-                    '过去7天': [moment().subtract(7, 'days'), moment().subtract(1, 'days')],
-                    '过去14天': [moment().subtract(14, 'days'), moment().subtract(1, 'days')],
-                    '过去30天': [moment().subtract(30, 'days'), moment().subtract(1, 'days')],
-                    '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                    '过去90天': [moment().subtract(90, 'days'), moment().subtract(1, 'days')],
-                    '过去半年': [moment().subtract(180, 'days'), moment().subtract(1, 'days')],
-                    '上周(周日至周六)': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
-                    '上周(周一至周日)': [moment().subtract(1, 'week').startOf('week').subtract(-1, 'days'), moment().subtract(1, 'week').endOf('week').subtract(-1, 'days')],
-                    '自选': [moment(), [moment(), moment().subtract(-1, 'days')],],
-                },
-                startDate: moment().subtract(7, 'days'),
-                endDate: moment().subtract(1, 'days'),
-                maxDate: moment(),
-            }, function (start, end, label) {
-                //console.log(label);
-                if (label == '今天') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('今天');
-                } else if (label == '昨天') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('昨天');
-                } else if (label == '前天') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('前天');
-                } else if (label == '过去7天') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('过去7天');
-                } else if (label == '过去14天') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('过去14天');
-                } else if (label == '过去30天') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('过去30天');
-                } else if (label == '上月') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('上月');
-                } else if (label == '过去90天') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('过去90天');
-                } else if (label == '过去半年') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('过去半年');
-                } else if (label == '上周(周日至周六)') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('上周(周日至周六)');
-                } else if (label == '上周(周一至周日)') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html('上周(周一至周日)');
-                } else if (label == '自选') {
-                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                    $('#daterange-btn > span:nth-child(2)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
-                }
-                //console.log($('#daterange-btn > span:nth-child(1)').html());
-            }
-        );
+        console.log(GetMonthStr(-1));
+        //时间范围
+        laydate.render({
+            elem: '#daterange-btn',
+            type: 'month',
+            range: true,
+            value: GetMonthStr(-1)
+        });
 
         layui.formSelects.opened('username', function (id) {
             obj_value = 'person';
@@ -213,8 +151,8 @@
         loadechartsdiv();
         //监听轮播切换事件
         carousel.on('change(carousel)', function (obj) {
-            var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn span').html() + '&page=1&limit=20';
-            $.get('/api/statistical-rate-data/' + parameter).done(function (data) {
+            var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn').html() + '&page=1&limit=20';
+            $.get('/api/statistical-month-rate-data/' + parameter).done(function (data) {
                 var Chart = echarts.init(document.getElementById('echarts-funnel-data-' + obj.index));
                 option = {
                     title: {
@@ -302,10 +240,10 @@
             element.render('collapse');
         });
 
-        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn span').html();
+        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn').html();
         table.render({
             elem: '#statistical-rate',
-            url: '/api/statistical-rate-data/' + parameter,
+            url: '/api/statistical-month-rate-data/' + parameter,
             toolbar: '#tool-top',
             defaultToolbar: [
                 'filter', 'exports', 'print', {
@@ -390,11 +328,11 @@
         //console.log(layui.formSelects.value('username', 'val'));
         //console.log(layui.formSelects.value('group-name', 'val'));
         loadechartsdiv();
-        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn span').html();
+        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn').html();
         if ($('#data-source').val() === 'development') {
             layui.table.reload('statistical-rate', {
                 elem: '#statistical-rate',
-                url: '/api/statistical-rate-data/' + parameter,
+                url: '/api/statistical-month-rate-data/' + parameter,
                 toolbar: '#tool-top',
                 defaultToolbar: [
                     'filter', 'exports', 'print', {
@@ -433,7 +371,7 @@
         } else if ($('#data-source').val() === 'return') {
             layui.table.render({
                 elem: '#statistical-rate',
-                url: '/api/statistical-rate-data/' + parameter,
+                url: '/api/statistical-month-rate-data/' + parameter,
                 toolbar: '#tool-top',
                 defaultToolbar: [
                     'filter', 'exports', 'print', {
@@ -471,7 +409,7 @@
         } else {
             layui.table.render({
                 elem: '#statistical-rate',
-                url: '/api/statistical-rate-data/' + parameter,
+                url: '/api/statistical-month-rate-data/' + parameter,
                 toolbar: '#tool-top',
                 defaultToolbar: [
                     'filter', 'exports', 'print', {
@@ -514,7 +452,7 @@
         for (var i = 1; i <= item_length; i++) {
             $("#item").remove();
         }
-        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn span').html() + '&page=1&limit=20';
+        var parameter = '?types=' + $('#data-source').val() + '&obj=' + obj_value + '&id=[' + id_value + ']&date-range=' + $('#daterange-btn').html() + '&page=1&limit=20';
         var ins = layui.carousel.render({
             elem: '#carousel',
             width: '100%',
@@ -524,7 +462,7 @@
             autoplay: false
         });
         $.ajax({
-            url: '/api/statistical-rate-data/' + parameter,
+            url: '/api/statistical-month-rate-data/' + parameter,
             type: 'GET',
             dataType: 'json',
             success: function (data) {

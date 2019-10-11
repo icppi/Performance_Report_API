@@ -1,3 +1,4 @@
+import calendar
 import datetime
 import json
 import re
@@ -28,6 +29,20 @@ def user_view(request):
 def group_view(request):
     if request.user.is_authenticated:
         return render(request, 'group.html')
+    else:
+        return render(request, 'login.html')
+
+
+def month_statistical_rate_view(request):
+    if request.user.is_authenticated:
+        return render(request, 'month-statistical-report.html')
+    else:
+        return render(request, 'login.html')
+
+
+def lifting_list_view(request):
+    if request.user.is_authenticated:
+        return render(request, 'lifting-list-data.html')
     else:
         return render(request, 'login.html')
 
@@ -1283,7 +1298,7 @@ def transfer_performance_data_api(request):
         return JsonResponse(status=status.HTTP_200_OK, data=data)
 
 
-# 报表统计
+# 日报表
 @exception(logger)
 def data_conversion_rate(request):
     if request.method == 'GET':
@@ -1897,19 +1912,31 @@ def data_conversion_rate(request):
                     'transaction_rate': str(transaction_rate),
                     'per_data_sum': str(per_data_sum),
                 }
+                rex = re.compile(r'(.*?)[%]', re.S)
+                echarts_data = {
+                    'success_opening_rate': float(re.findall(rex, success_opening_rate)[0]),
+                    'business_introduction_rate': float(re.findall(rex, business_introduction_rate)[0]),
+                    'answer_question_rate': float(re.findall(rex, answer_question_rate)[0]),
+                    'contract_pay_rate': float(re.findall(rex, contract_pay_rate)[0]),
+                    'transaction_rate': float(re.findall(rex, transaction_rate)[0]),
+                }
                 if obj == 'group':
-                    res_data.setdefault('name', GroupModel.objects.get(id=id_list[list_count]).group_name)
+                    group_name = GroupModel.objects.get(id=id_list[list_count]).group_name
+                    res_data.setdefault('name', group_name)
+                    echarts_data.setdefault('name', group_name)
                 if obj == 'person':
-                    res_data.setdefault('name', PersonModel.objects.get(id=id_list[list_count]).username)
+                    username = PersonModel.objects.get(id=id_list[list_count]).username
+                    res_data.setdefault('name', username)
+                    echarts_data.setdefault('name', username)
                 item_list.append(res_data)
-                list_count += 1
+                echarts_list.append(echarts_data)
             rows = {
                 'code': 0,
                 'msg': 'success',
                 'count': item_list.__len__(),
                 'data': {
                     'datasheet': item_list[(int(page) - 1) * int(limit):int(page) * int(limit)],
-                    'echarts': 'echarts'
+                    'echarts': echarts_list[(int(page) - 1) * int(limit):int(page) * int(limit)],
                 }
             }
             return JsonResponse(status=status.HTTP_200_OK, data=rows)
@@ -2141,19 +2168,31 @@ def data_conversion_rate(request):
                     'transaction_rate': str(transaction_rate),
                     'per_data_sum': str(per_data_sum),
                 }
+                rex = re.compile(r'(.*?)[%]', re.S)
+                echarts_data = {
+                    'success_opening_rate': float(re.findall(rex, success_opening_rate)[0]),
+                    'business_introduction_rate': float(re.findall(rex, business_introduction_rate)[0]),
+                    'answer_question_rate': float(re.findall(rex, answer_question_rate)[0]),
+                    'contract_pay_rate': float(re.findall(rex, contract_pay_rate)[0]),
+                    'transaction_rate': float(re.findall(rex, transaction_rate)[0]),
+                }
                 if obj == 'group':
-                    res_data.setdefault('name', GroupModel.objects.get(id=id_list[list_count]).group_name)
+                    group_name = GroupModel.objects.get(id=id_list[list_count]).group_name
+                    res_data.setdefault('name', group_name)
+                    echarts_data.setdefault('name', group_name)
                 if obj == 'person':
-                    res_data.setdefault('name', PersonModel.objects.get(id=id_list[list_count]).username)
+                    username = PersonModel.objects.get(id=id_list[list_count]).username
+                    res_data.setdefault('name', username)
+                    echarts_data.setdefault('name', username)
                 item_list.append(res_data)
-                list_count += 1
+                echarts_list.append(echarts_data)
             rows = {
                 'code': 0,
                 'msg': 'success',
                 'count': item_list.__len__(),
                 'data': {
                     'datasheet': item_list[(int(page) - 1) * int(limit):int(page) * int(limit)],
-                    'echarts': 'echarts'
+                    'echarts': echarts_list[(int(page) - 1) * int(limit):int(page) * int(limit)],
                 }
             }
             return JsonResponse(status=status.HTTP_200_OK, data=rows)
@@ -2459,5 +2498,1115 @@ def top_data_api(request):
                                       'ret_return': ret_return,
                                       'ret_rate': return_person_rate_list[:num],
                                       'ret_transaction': ret_transaction,
+                                  }
+                              })
+
+
+# 月报表
+@exception(logger)
+def data_conversion_month_rate(request):
+    if request.method == 'GET':
+        # 新增数据
+        id = request.GET.get('id')
+        page = request.GET.get('page')
+        limit = request.GET.get('limit')
+        obj = request.GET.get('obj')
+        types = request.GET.get('types')
+        date_range = request.GET.get('date-range')
+
+        # 判断数据类型(新增/回访) 必选
+        if types is not None and types != '' and types != 'undefined':
+            if types == 'development':
+                same_period_data = data = DevelopmentDataModel.objects.all()
+            elif types == 'return':
+                same_period_data = data = ReturnDataModel.objects.all()
+            elif types == 'highseas':
+                same_period_data = data = HighSeasDataModel.objects.all()
+            else:
+                return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={'code': 10001, 'msg': '参数错误'})
+        else:
+            return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={'code': 10001, 'msg': '参数错误'})
+
+        same_period_performance_data = performance_data = PerformanceDataModel.objects.all()
+
+        month_data_list = []
+        month_performance_data_list = []
+        month_same_period_data_list = []
+        month_same_period_performance_data_list = []
+        # 过滤时间
+        if date_range is not None and date_range != '' and date_range != 'undefined':
+            try:
+                start = str(date_range).split(' - ')[0]
+                end = str(date_range).split(' - ')[1]
+            except Exception as e:
+                start = end = str(date_range)
+            start_list = start.split('-')
+            end_list = end.split('-')
+            start = start_list[0] + '-' + start_list[1] + '-01'
+            end = end_list[0] + '-' + end_list[1] + '-' + str(calendar.mdays[int(end_list[1])])
+            if start is not None and start != '' and end is not None and end != '':
+                months = utils.monthRange(start, end)
+                for month in months:
+                    end_list = start_list = month.split('-')
+                    start = start_list[0] + '-' + start_list[1] + '-01'
+                    end = end_list[0] + '-' + end_list[1] + '-' + str(calendar.mdays[int(end_list[1])])
+                    start = utils.parse_ymd(start + ' 00:00:00')
+                    end = utils.parse_ymd(end + ' 23:59:59')
+                    if types is not None and types != 'undefined':
+                        # 当前选择日期数据
+                        month_data = data.filter(data_time__range=(start, end))
+                        month_performance_data = performance_data.filter(data_time__range=(start, end))
+                        # 同期对比数据
+                        month_same_period_data = same_period_data.filter(data_time__range=(utils.from_before_n_day(start, calendar.mdays[int(start_list[1])]), utils.from_before_n_day(end, calendar.mdays[int(start_list[1])])))
+                        month_same_period_performance_data = same_period_performance_data.filter(data_time__range=(utils.from_before_n_day(start, calendar.mdays[int(start_list[1])]), utils.from_before_n_day(end, calendar.mdays[int(start_list[1])])))
+
+                        month_data_list.append(month_data)
+                        month_performance_data_list.append(month_performance_data)
+                        month_same_period_data_list.append(month_same_period_data)
+                        month_same_period_performance_data_list.append(month_same_period_performance_data)
+
+        print(month_data_list.__len__(), month_data_list)
+        print(month_performance_data_list.__len__(), month_performance_data_list)
+        print(month_same_period_data_list.__len__(), month_same_period_data_list)
+        print(month_same_period_performance_data_list.__len__(), month_same_period_performance_data_list)
+
+        if id is not None and id != '' and id != 'undefined' and id != '[]':
+            id_list = str(id)[1:-1].split(',')
+        else:
+            if obj == 'group':
+                id_list = [group.id for group in GroupModel.objects.all()]
+            else:
+                id_list = [person.id for person in PersonModel.objects.all()]
+
+        res_data = []
+        echarts_data = []
+        res_count = 0
+        for month in range(months.__len__()):
+            # 当前选择日期数据
+            data_list = []
+            performance_data_list = []
+            # 同期数据
+            same_period_data_list = []
+            same_period_performance_data_list = []
+            if obj is not None and obj != '' and obj != 'undefined':
+                data = month_data_list[month]
+                performance_data = month_performance_data_list[month]
+                same_period_data = month_same_period_data_list[month]
+                same_period_performance_data = month_same_period_performance_data_list[month]
+                # 取整组的数据
+                if obj == 'group':
+                    for index in id_list:
+                        person = PersonModel.objects.filter(group_id=index)
+                        # 当前日期整组数据
+                        data_list.append(data.filter(person_id__in=person))
+                        performance_data_list.append(performance_data.filter(person_id__in=person))
+                        # 同期整组数据
+                        same_period_data_list.append(same_period_data.filter(person_id__in=person))
+                        same_period_performance_data_list.append(same_period_performance_data.filter(person_id__in=person))
+                # 取人员的数据
+                if obj == 'person':
+                    for index in id_list:
+                        # 当前日期人员数据
+                        data_list.append(data.filter(person_id=index))
+                        performance_data_list.append(performance_data.filter(person_id=index))
+                        # 同期人员数据
+                        same_period_data_list.append(same_period_data.filter(person_id=index))
+                        same_period_performance_data_list.append(same_period_performance_data.filter(person_id=index))
+            list_count = 0
+            if types == 'development':
+                same_period_rate_list = []
+                if same_period_data_list.__len__() > 0 or same_period_performance_data_list.__len__() > 0:
+                    same_period_list_count = 0
+                    for same_period_data_items in same_period_data_list:
+                        if same_period_data_items.__len__() <= 0:
+                            continue
+                        same_period_dev_data_lists = []
+                        same_period_per_data_lists = []
+                        for same_period_per_item in same_period_performance_data_list[same_period_list_count]:
+                            if same_period_per_item.source == 0:
+                                same_period_transaction_volume = same_period_per_item.transaction_volume
+                            else:
+                                same_period_transaction_volume = 0
+                            if same_period_transaction_volume is None:
+                                same_period_transaction_volume = 0
+                            same_period_per_data_lists.append(same_period_transaction_volume)
+                        for same_period_data_item in same_period_data_items:
+                            same_period_new_volume = same_period_data_item.new_volume
+                            same_period_new_customer_volume = same_period_data_item.new_customer_volume
+                            same_period_success_opening_volume = same_period_data_item.success_opening_volume
+                            same_period_business_introduction_volume = same_period_data_item.business_introduction_volume
+                            same_period_answer_question_volume = same_period_data_item.answer_question_volume
+                            same_period_contract_pay_volume = same_period_data_item.contract_pay_volume
+                            same_period_quality_error_volume = same_period_data_item.quality_error_volume
+                            if same_period_new_volume is None:
+                                same_period_new_volume = 0
+                            if same_period_new_customer_volume is None:
+                                same_period_new_customer_volume = 0
+                            if same_period_success_opening_volume is None:
+                                same_period_success_opening_volume = 0
+                            if same_period_business_introduction_volume is None:
+                                same_period_business_introduction_volume = 0
+                            if same_period_answer_question_volume is None:
+                                same_period_answer_question_volume = 0
+                            if same_period_contract_pay_volume is None:
+                                same_period_contract_pay_volume = 0
+                            if same_period_quality_error_volume is None:
+                                same_period_quality_error_volume = 0
+                            same_period_dev_data_list = [same_period_new_volume, same_period_new_customer_volume, same_period_success_opening_volume, same_period_business_introduction_volume, same_period_answer_question_volume, same_period_contract_pay_volume, same_period_quality_error_volume]
+                            same_period_dev_data_lists.append(same_period_dev_data_list)
+                        # 求和
+                        same_period_data_sum = np.sum(same_period_dev_data_lists, axis=0)
+                        same_period_per_data_sum = np.sum(same_period_per_data_lists)
+                        # 求各项rate
+                        if same_period_data_sum[1] is None or same_period_data_sum[1] == 0:
+                            same_period_success_opening_rate = 0.0
+                        else:
+                            same_period_success_opening_rate = round((same_period_data_sum[2] / float(same_period_data_sum[1])) * 100, 2)  # 成功开场率
+
+                        if same_period_data_sum[2] is None or same_period_data_sum[2] == 0:
+                            same_period_business_introduction_rate = 0.0
+                        else:
+                            same_period_business_introduction_rate = round((same_period_data_sum[3] / float(same_period_data_sum[2])) * 100, 2)  # 业务介绍成功率
+
+                        if same_period_data_sum[3] is None or same_period_data_sum[3] == 0:
+                            same_period_answer_question_rate = 0.0
+                        else:
+                            same_period_answer_question_rate = round((same_period_data_sum[4] / float(same_period_data_sum[3])) * 100, 2)  # 解答问题成功率
+
+                        if same_period_data_sum[4] is None or same_period_data_sum[4] == 0:
+                            same_period_contract_pay_rate = 0.0
+                        else:
+                            same_period_contract_pay_rate = round((same_period_data_sum[5] / float(same_period_data_sum[4])) * 100, 2)  # 约定付款率
+
+                        if same_period_data_sum[0] is None or same_period_data_sum[0] == 0:
+                            same_period_transaction_rate = 0.0
+                        else:
+                            same_period_transaction_rate = round((same_period_per_data_sum / float(same_period_data_sum[0])) * 100, 2)  # 成交率
+                        # 存储同期百分比
+                        same_period_rate = [
+                            same_period_data_sum[0],
+                            same_period_data_sum[1],
+                            same_period_success_opening_rate,
+                            same_period_business_introduction_rate,
+                            same_period_answer_question_rate,
+                            same_period_contract_pay_rate,
+                            same_period_transaction_rate,
+                            same_period_per_data_sum
+                        ]
+                        same_period_rate_list.append(same_period_rate)
+                        same_period_list_count += 1
+                    print(same_period_rate_list.__len__(), same_period_rate_list)
+
+                for data_items in data_list:
+                    if data_items.__len__() <= 0:
+                        continue
+                    dev_data_lists = []
+                    per_data_lists = []
+                    for per_item in performance_data_list[list_count]:
+                        if per_item.source == 0:
+                            transaction_volume = per_item.transaction_volume
+                        else:
+                            transaction_volume = 0
+                        if transaction_volume is None:
+                            transaction_volume = 0
+                        per_data_lists.append(transaction_volume)
+                    for data_item in data_items:
+                        new_volume = data_item.new_volume
+                        new_customer_volume = data_item.new_customer_volume
+                        success_opening_volume = data_item.success_opening_volume
+                        business_introduction_volume = data_item.business_introduction_volume
+                        answer_question_volume = data_item.answer_question_volume
+                        contract_pay_volume = data_item.contract_pay_volume
+                        quality_error_volume = data_item.quality_error_volume
+                        if new_volume is None:
+                            new_volume = 0
+                        if new_customer_volume is None:
+                            new_customer_volume = 0
+                        if success_opening_volume is None:
+                            success_opening_volume = 0
+                        if business_introduction_volume is None:
+                            business_introduction_volume = 0
+                        if answer_question_volume is None:
+                            answer_question_volume = 0
+                        if contract_pay_volume is None:
+                            contract_pay_volume = 0
+                        if quality_error_volume is None:
+                            quality_error_volume = 0
+                        dev_data_list = [new_volume, new_customer_volume, success_opening_volume, business_introduction_volume, answer_question_volume, contract_pay_volume, quality_error_volume]
+                        dev_data_lists.append(dev_data_list)
+                    if dev_data_lists.__len__() <= 0:  # 如果该用户没有数据则跳过
+                        continue
+                    data_sum = np.sum(dev_data_lists, axis=0)
+                    per_data_sum = np.sum(per_data_lists)
+                    # 求各项rate
+                    if data_sum[1] is None or data_sum[1] == 0:
+                        success_opening_rate = 0.0
+                    else:
+                        success_opening_rate = round((data_sum[2] / float(data_sum[1])) * 100, 2)  # 成功开场率
+
+                    if data_sum[2] is None or data_sum[2] == 0:
+                        business_introduction_rate = 0.0
+                    else:
+                        business_introduction_rate = round((data_sum[3] / float(data_sum[2])) * 100, 2)  # 业务介绍成功率
+
+                    if data_sum[3] is None or data_sum[3] == 0:
+                        answer_question_rate = 0.0
+                    else:
+                        answer_question_rate = round((data_sum[4] / float(data_sum[3])) * 100, 2)  # 解答问题成功率
+
+                    if data_sum[4] is None or data_sum[4] == 0:
+                        contract_pay_rate = 0.0
+                    else:
+                        contract_pay_rate = round((data_sum[5] / float(data_sum[4])) * 100, 2)  # 约定付款率
+
+                    if data_sum[0] is None or data_sum[0] == 0:
+                        transaction_rate = 0.0
+                    else:
+                        transaction_rate = round((per_data_sum / float(data_sum[0])) * 100, 2)  # 成交率
+                    new_volume = str(data_sum[0])
+                    new_customer_volume = str(data_sum[1])
+
+                    # 同期数据对比
+                    if same_period_rate_list.__len__() > 0:
+                        res_same_period_new_volume = data_sum[0] - same_period_rate_list[list_count][0]
+                        res_same_period_new_customer_volume = data_sum[1] - same_period_rate_list[list_count][1]
+                        res_same_period_success_opening_rate = round((success_opening_rate - same_period_rate_list[list_count][2]), 2)
+                        res_same_period_business_introduction_rate = round((business_introduction_rate - same_period_rate_list[list_count][3]), 2)
+                        res_same_period_answer_question_rate = round((answer_question_rate - same_period_rate_list[list_count][4]), 2)
+                        res_same_period_contract_pay_rate = round((contract_pay_rate - same_period_rate_list[list_count][5]), 2)
+                        res_same_period_transaction_rate = round((transaction_rate - same_period_rate_list[list_count][6]), 2)
+                        res_same_period_per_data_sum = per_data_sum - same_period_rate_list[list_count][7]
+
+                        if res_same_period_new_volume > 0:
+                            new_volume = str(data_sum[0]) + '(↑' + str(int(res_same_period_new_volume)) + ')'
+                        elif res_same_period_new_volume == 0:
+                            new_volume = str(data_sum[0])
+                        else:
+                            new_volume = str(data_sum[0]) + '(↓' + str(abs(res_same_period_new_volume)) + ')'
+
+                        if res_same_period_new_customer_volume > 0:
+                            new_customer_volume = str(data_sum[1]) + '(↑' + str(int(res_same_period_new_customer_volume)) + ')'
+                        elif res_same_period_new_customer_volume == 0:
+                            new_customer_volume = str(data_sum[1])
+                        else:
+                            new_customer_volume = str(data_sum[1]) + '(↓' + str(abs(res_same_period_new_customer_volume)) + ')'
+
+                        if res_same_period_success_opening_rate > 0:
+                            success_opening_rate = str(success_opening_rate) + '%(↑' + str(res_same_period_success_opening_rate) + '%)'
+                        elif res_same_period_success_opening_rate == 0:
+                            success_opening_rate = str(success_opening_rate) + '%'
+                        else:
+                            success_opening_rate = str(success_opening_rate) + '%(↓' + str(abs(res_same_period_success_opening_rate)) + '%)'
+
+                        if res_same_period_business_introduction_rate > 0:
+                            business_introduction_rate = str(business_introduction_rate) + '%(↑' + str(res_same_period_business_introduction_rate) + '%)'
+                        elif res_same_period_business_introduction_rate == 0:
+                            business_introduction_rate = str(business_introduction_rate) + '%'
+                        else:
+                            business_introduction_rate = str(business_introduction_rate) + '%(↓' + str(abs(res_same_period_business_introduction_rate)) + '%)'
+
+                        if res_same_period_answer_question_rate > 0:
+                            answer_question_rate = str(answer_question_rate) + '%(↑' + str(res_same_period_answer_question_rate) + '%)'
+                        elif res_same_period_answer_question_rate == 0:
+                            answer_question_rate = str(answer_question_rate) + '%'
+                        else:
+                            answer_question_rate = str(answer_question_rate) + '%(↓' + str(abs(res_same_period_answer_question_rate)) + '%)'
+
+                        if res_same_period_contract_pay_rate > 0:
+                            contract_pay_rate = str(contract_pay_rate) + '%(↑' + str(res_same_period_contract_pay_rate) + '%)'
+                        elif res_same_period_contract_pay_rate == 0:
+                            contract_pay_rate = str(contract_pay_rate) + '%'
+                        else:
+                            contract_pay_rate = str(contract_pay_rate) + '%(↓' + str(abs(res_same_period_contract_pay_rate)) + '%)'
+
+                        if res_same_period_transaction_rate > 0:
+                            transaction_rate = str(transaction_rate) + '%(↑' + str(res_same_period_transaction_rate) + '%)'
+                        elif res_same_period_transaction_rate == 0:
+                            transaction_rate = str(transaction_rate) + '%'
+                        else:
+                            transaction_rate = str(transaction_rate) + '%(↓' + str(abs(res_same_period_transaction_rate)) + '%)'
+
+                        if res_same_period_per_data_sum > 0:
+                            per_data_sum = str(int(per_data_sum)) + '(↑' + str(int(res_same_period_per_data_sum)) + ')'
+                        elif res_same_period_per_data_sum == 0:
+                            per_data_sum = str(int(per_data_sum))
+                        else:
+                            per_data_sum = str(int(per_data_sum)) + '(↓' + str(abs(res_same_period_per_data_sum)) + ')'
+                    else:
+                        transaction_rate = str(transaction_rate) + '%'
+                        success_opening_rate = str(success_opening_rate) + '%'
+                        business_introduction_rate = str(business_introduction_rate) + '%'
+                        contract_pay_rate = str(contract_pay_rate) + '%'
+                        answer_question_rate = str(answer_question_rate) + '%'
+                    ret_data = {
+                        'new_volume': str(new_volume),
+                        'new_customer_volume': str(new_customer_volume),
+                        'success_opening_rate': str(success_opening_rate),
+                        'business_introduction_rate': str(business_introduction_rate),
+                        'answer_question_rate': str(answer_question_rate),
+                        'contract_pay_rate': str(contract_pay_rate),
+                        'transaction_rate': str(transaction_rate),
+                        'per_data_sum': str(per_data_sum),
+                    }
+                    ret_month = months[month].split('-')
+                    ret_data.setdefault('date', str(ret_month[0] + '年' + ret_month[1] + '月'))
+                    rex = re.compile(r'(.*?)[%]', re.S)
+                    echarts_data_item = {
+                        'success_opening_rate': float(re.findall(rex, success_opening_rate)[0]),
+                        'business_introduction_rate': float(re.findall(rex, business_introduction_rate)[0]),
+                        'answer_question_rate': float(re.findall(rex, answer_question_rate)[0]),
+                        'contract_pay_rate': float(re.findall(rex, contract_pay_rate)[0]),
+                        'transaction_rate': float(re.findall(rex, transaction_rate)[0]),
+                    }
+                    if obj == 'group':
+                        group_name = GroupModel.objects.get(id=id_list[list_count]).group_name
+                        ret_data.setdefault('name', group_name)
+                        echarts_data_item.setdefault('name', group_name)
+                    if obj == 'person':
+                        username = PersonModel.objects.get(id=id_list[list_count]).username
+                        ret_data.setdefault('name', username)
+                        echarts_data_item.setdefault('name', username)
+                    res_data.append(ret_data)
+                    echarts_data.append(echarts_data_item)
+                    list_count += 1
+                    res_count += 1
+
+            elif types == 'return':
+                same_period_rate_list = []
+                if same_period_data_list.__len__() > 0 or same_period_performance_data_list.__len__() > 0:
+                    same_period_list_count = 0
+                    for same_period_data_items in same_period_data_list:
+                        if same_period_data_items.__len__() <= 0:
+                            continue
+                        same_period_dev_data_lists = []
+                        same_period_per_data_lists = []
+                        for same_period_per_item in same_period_performance_data_list[same_period_list_count]:
+                            if same_period_per_item.source == 0:
+                                same_period_transaction_volume = same_period_per_item.transaction_volume
+                            else:
+                                same_period_transaction_volume = 0
+                            if same_period_transaction_volume is None:
+                                same_period_transaction_volume = 0
+                            same_period_per_data_lists.append(same_period_transaction_volume)
+                        for same_period_data_item in same_period_data_items:
+                            same_period_return_visit_volume = same_period_data_item.return_visit_volume
+                            same_period_success_opening_volume = same_period_data_item.success_opening_volume
+                            same_period_business_introduction_volume = same_period_data_item.business_introduction_volume
+                            same_period_answer_question_volume = same_period_data_item.answer_question_volume
+                            same_period_contract_pay_volume = same_period_data_item.contract_pay_volume
+                            same_period_quality_error_volume = same_period_data_item.quality_error_volume
+                            if same_period_return_visit_volume is None:
+                                same_period_return_visit_volume = 0
+                            if same_period_success_opening_volume is None:
+                                same_period_success_opening_volume = 0
+                            if same_period_business_introduction_volume is None:
+                                same_period_business_introduction_volume = 0
+                            if same_period_answer_question_volume is None:
+                                same_period_answer_question_volume = 0
+                            if same_period_contract_pay_volume is None:
+                                same_period_contract_pay_volume = 0
+                            if same_period_quality_error_volume is None:
+                                same_period_quality_error_volume = 0
+                            same_period_dev_data_list = [same_period_return_visit_volume, same_period_success_opening_volume, same_period_business_introduction_volume, same_period_answer_question_volume, same_period_contract_pay_volume, same_period_quality_error_volume]
+                            same_period_dev_data_lists.append(same_period_dev_data_list)
+                        # 求和
+                        same_period_data_sum = np.sum(same_period_dev_data_lists, axis=0)
+                        same_period_per_data_sum = np.sum(same_period_per_data_lists)
+                        # 求各项rate
+                        if same_period_data_sum[0] is None or same_period_data_sum[0] == 0:
+                            same_period_success_opening_rate = 0.0
+                        else:
+                            same_period_success_opening_rate = round((same_period_data_sum[1] / float(same_period_data_sum[0])) * 100, 2)  # 成功开场率
+
+                        if same_period_data_sum[1] is None or same_period_data_sum[1] == 0:
+                            same_period_business_introduction_rate = 0.0
+                        else:
+                            same_period_business_introduction_rate = round((same_period_data_sum[2] / float(same_period_data_sum[1])) * 100, 2)  # 业务介绍成功率
+
+                        if same_period_data_sum[2] is None or same_period_data_sum[2] == 0:
+                            same_period_answer_question_rate = 0.0
+                        else:
+                            same_period_answer_question_rate = round((same_period_data_sum[3] / float(same_period_data_sum[2])) * 100, 2)  # 解答问题成功率
+
+                        if same_period_data_sum[3] is None or same_period_data_sum[3] == 0:
+                            same_period_contract_pay_rate = 0.0
+                        else:
+                            same_period_contract_pay_rate = round((same_period_data_sum[4] / float(same_period_data_sum[3])) * 100, 2)  # 约定付款率
+
+                        if same_period_data_sum[1] is None or same_period_data_sum[1] == 0:
+                            same_period_transaction_rate = 0.0
+                        else:
+                            same_period_transaction_rate = round((same_period_per_data_sum / float(same_period_data_sum[1])) * 100, 2)  # 成交率
+
+                        # 存储同期百分比
+                        same_period_rate = [
+                            same_period_data_sum[0],
+                            same_period_data_sum[1],
+                            same_period_success_opening_rate,
+                            same_period_business_introduction_rate,
+                            same_period_answer_question_rate,
+                            same_period_contract_pay_rate,
+                            same_period_transaction_rate,
+                            same_period_per_data_sum
+                        ]
+                        same_period_rate_list.append(same_period_rate)
+                        same_period_list_count += 1
+
+                    print(same_period_rate_list.__len__(), same_period_rate_list)
+
+                for data_items in data_list:
+                    if data_items.__len__() <= 0:
+                        continue
+                    dev_data_lists = []
+                    per_data_lists = []
+                    for per_item in performance_data_list[list_count]:
+                        if per_item.source == 0:
+                            transaction_volume = per_item.transaction_volume
+                        else:
+                            transaction_volume = 0
+                        if transaction_volume is None:
+                            transaction_volume = 0
+                        per_data_lists.append(transaction_volume)
+                    for data_item in data_items:
+                        return_visit_volume = data_item.return_visit_volume
+                        success_opening_volume = data_item.success_opening_volume
+                        business_introduction_volume = data_item.business_introduction_volume
+                        answer_question_volume = data_item.answer_question_volume
+                        contract_pay_volume = data_item.contract_pay_volume
+                        quality_error_volume = data_item.quality_error_volume
+
+                        if return_visit_volume is None:
+                            return_visit_volume = 0
+                        if success_opening_volume is None:
+                            success_opening_volume = 0
+                        if business_introduction_volume is None:
+                            business_introduction_volume = 0
+                        if answer_question_volume is None:
+                            answer_question_volume = 0
+                        if contract_pay_volume is None:
+                            contract_pay_volume = 0
+                        if quality_error_volume is None:
+                            quality_error_volume = 0
+                        dev_data_list = [return_visit_volume, success_opening_volume, business_introduction_volume, answer_question_volume, contract_pay_volume, quality_error_volume]
+                        dev_data_lists.append(dev_data_list)
+                    if dev_data_lists.__len__() <= 0:  # 如果该用户没有数据则跳过
+                        continue
+                    data_sum = np.sum(dev_data_lists, axis=0)
+                    per_data_sum = np.sum(per_data_lists)
+                    # 求各项rate
+                    if data_sum[1] is None or data_sum[1] == 0:
+                        success_opening_rate = 0.0
+                    else:
+                        success_opening_rate = round((data_sum[2] / float(data_sum[1])) * 100, 2)  # 成功开场率
+
+                    if data_sum[2] is None or data_sum[2] == 0:
+                        business_introduction_rate = 0.0
+                    else:
+                        business_introduction_rate = round((data_sum[3] / float(data_sum[2])) * 100, 2)  # 业务介绍成功率
+
+                    if data_sum[3] is None or data_sum[3] == 0:
+                        answer_question_rate = 0.0
+                    else:
+                        answer_question_rate = round((data_sum[4] / float(data_sum[3])) * 100, 2)  # 解答问题成功率
+
+                    if data_sum[4] is None or data_sum[4] == 0:
+                        contract_pay_rate = 0.0
+                    else:
+                        contract_pay_rate = round((data_sum[5] / float(data_sum[4])) * 100, 2)  # 约定付款率
+
+                    if data_sum[0] is None or data_sum[0] == 0:
+                        transaction_rate = 0.0
+                    else:
+                        transaction_rate = round((per_data_sum / float(data_sum[0])) * 100, 2)  # 成交率
+                    return_visit_volume = str(data_sum[0])
+                    # 同期数据对比
+                    if same_period_rate_list.__len__() > 0:
+                        res_same_period_return_visit_volume = data_sum[0] - same_period_rate_list[list_count][0]
+                        res_same_period_success_opening_rate = round((success_opening_rate - same_period_rate_list[list_count][1]), 2)
+                        res_same_period_business_introduction_rate = round((business_introduction_rate - same_period_rate_list[list_count][2]), 2)
+                        res_same_period_answer_question_rate = round((answer_question_rate - same_period_rate_list[list_count][3]), 2)
+                        res_same_period_contract_pay_rate = round((contract_pay_rate - same_period_rate_list[list_count][4]), 2)
+                        res_same_period_transaction_rate = round((transaction_rate - same_period_rate_list[list_count][5]), 2)
+                        res_same_period_per_data_sum = per_data_sum - same_period_rate_list[list_count][7]
+
+                        if res_same_period_return_visit_volume > 0:
+                            return_visit_volume = str(data_sum[0]) + '(↑' + str(int(res_same_period_return_visit_volume)) + ')'
+                        elif res_same_period_return_visit_volume == 0:
+                            return_visit_volume = str(data_sum[0])
+                        else:
+                            return_visit_volume = str(data_sum[0]) + '(↓' + str(abs(res_same_period_return_visit_volume)) + ')'
+
+                        if res_same_period_success_opening_rate > 0:
+                            success_opening_rate = str(success_opening_rate) + '%(↑' + str(res_same_period_success_opening_rate) + '%)'
+                        elif res_same_period_success_opening_rate == 0:
+                            success_opening_rate = str(success_opening_rate) + '%'
+                        else:
+                            success_opening_rate = str(success_opening_rate) + '%(↓' + str(abs(res_same_period_success_opening_rate)) + '%)'
+
+                        if res_same_period_business_introduction_rate > 0:
+                            business_introduction_rate = str(business_introduction_rate) + '%(↑' + str(res_same_period_business_introduction_rate) + '%)'
+                        elif res_same_period_business_introduction_rate == 0:
+                            business_introduction_rate = str(business_introduction_rate) + '%'
+                        else:
+                            business_introduction_rate = str(business_introduction_rate) + '%(↓' + str(abs(res_same_period_business_introduction_rate)) + '%)'
+
+                        if res_same_period_answer_question_rate > 0:
+                            answer_question_rate = str(answer_question_rate) + '%(↑' + str(res_same_period_answer_question_rate) + '%)'
+                        elif res_same_period_answer_question_rate == 0:
+                            answer_question_rate = str(answer_question_rate) + '%'
+                        else:
+                            answer_question_rate = str(answer_question_rate) + '%(↓' + str(abs(res_same_period_answer_question_rate)) + '%)'
+
+                        if res_same_period_contract_pay_rate > 0:
+                            contract_pay_rate = str(contract_pay_rate) + '%(↑' + str(res_same_period_contract_pay_rate) + '%)'
+                        elif res_same_period_contract_pay_rate == 0:
+                            contract_pay_rate = str(contract_pay_rate) + '%'
+                        else:
+                            contract_pay_rate = str(contract_pay_rate) + '%(↓' + str(abs(res_same_period_contract_pay_rate)) + '%)'
+
+                        if res_same_period_transaction_rate > 0:
+                            transaction_rate = str(transaction_rate) + '%(↑' + str(res_same_period_transaction_rate) + '%)'
+                        elif res_same_period_transaction_rate == 0:
+                            transaction_rate = str(transaction_rate) + '%'
+                        else:
+                            transaction_rate = str(transaction_rate) + '%(↓' + str(abs(res_same_period_transaction_rate)) + '%)'
+
+                        if res_same_period_per_data_sum > 0:
+                            per_data_sum = str(int(per_data_sum)) + '(↑' + str(int(res_same_period_per_data_sum)) + ')'
+                        elif res_same_period_per_data_sum == 0:
+                            per_data_sum = str(int(per_data_sum))
+                        else:
+                            per_data_sum = str(int(per_data_sum)) + '(↓' + str(abs(res_same_period_per_data_sum)) + ')'
+                    else:
+                        transaction_rate = str(transaction_rate) + '%'
+                        success_opening_rate = str(success_opening_rate) + '%'
+                        business_introduction_rate = str(business_introduction_rate) + '%'
+                        contract_pay_rate = str(contract_pay_rate) + '%'
+                        answer_question_rate = str(answer_question_rate) + '%'
+                    ret_data = {
+                        'return_visit_volume': str(return_visit_volume),
+                        'success_opening_rate': str(success_opening_rate),
+                        'business_introduction_rate': str(business_introduction_rate),
+                        'answer_question_rate': str(answer_question_rate),
+                        'contract_pay_rate': str(contract_pay_rate),
+                        'transaction_rate': str(transaction_rate),
+                        'per_data_sum': str(per_data_sum),
+                    }
+                    ret_month = months[month].split('-')
+                    ret_data.setdefault('date', str(ret_month[0] + '年' + ret_month[1] + '月'))
+                    rex = re.compile(r'(.*?)[%]', re.S)
+                    echarts_data_item = {
+                        'success_opening_rate': float(re.findall(rex, success_opening_rate)[0]),
+                        'business_introduction_rate': float(re.findall(rex, business_introduction_rate)[0]),
+                        'answer_question_rate': float(re.findall(rex, answer_question_rate)[0]),
+                        'contract_pay_rate': float(re.findall(rex, contract_pay_rate)[0]),
+                        'transaction_rate': float(re.findall(rex, transaction_rate)[0]),
+                    }
+                    if obj == 'group':
+                        group_name = GroupModel.objects.get(id=id_list[list_count]).group_name
+                        ret_data.setdefault('name', group_name)
+                        echarts_data_item.setdefault('name', group_name)
+                    if obj == 'person':
+                        username = PersonModel.objects.get(id=id_list[list_count]).username
+                        ret_data.setdefault('name', username)
+                        echarts_data_item.setdefault('name', username)
+                    res_data.append(ret_data)
+                    echarts_data.append(echarts_data_item)
+                    list_count += 1
+                    res_count += 1
+            elif types == 'highseas':
+                same_period_rate_list = []
+                if same_period_data_list.__len__() > 0 or same_period_performance_data_list.__len__() > 0:
+                    same_period_list_count = 0
+                    for same_period_data_items in same_period_data_list:
+                        if same_period_data_items.__len__() <= 0:
+                            continue
+                        same_period_dev_data_lists = []
+                        same_period_per_data_lists = []
+                        for same_period_per_item in same_period_performance_data_list[same_period_list_count]:
+                            if same_period_per_item.source == 0:
+                                same_period_transaction_volume = same_period_per_item.transaction_volume
+                            else:
+                                same_period_transaction_volume = 0
+                            if same_period_transaction_volume is None:
+                                same_period_transaction_volume = 0
+                            same_period_per_data_lists.append(same_period_transaction_volume)
+                        for same_period_data_item in same_period_data_items:
+                            same_period_return_visit_volume = same_period_data_item.high_seas_volume
+                            same_period_success_opening_volume = same_period_data_item.success_opening_volume
+                            same_period_business_introduction_volume = same_period_data_item.business_introduction_volume
+                            same_period_answer_question_volume = same_period_data_item.answer_question_volume
+                            same_period_contract_pay_volume = same_period_data_item.contract_pay_volume
+                            same_period_quality_error_volume = same_period_data_item.quality_error_volume
+                            if same_period_return_visit_volume is None:
+                                same_period_return_visit_volume = 0
+                            if same_period_success_opening_volume is None:
+                                same_period_success_opening_volume = 0
+                            if same_period_business_introduction_volume is None:
+                                same_period_business_introduction_volume = 0
+                            if same_period_answer_question_volume is None:
+                                same_period_answer_question_volume = 0
+                            if same_period_contract_pay_volume is None:
+                                same_period_contract_pay_volume = 0
+                            if same_period_quality_error_volume is None:
+                                same_period_quality_error_volume = 0
+                            same_period_dev_data_list = [same_period_return_visit_volume, same_period_success_opening_volume, same_period_business_introduction_volume, same_period_answer_question_volume, same_period_contract_pay_volume, same_period_quality_error_volume]
+                            same_period_dev_data_lists.append(same_period_dev_data_list)
+                        # 求和
+                        same_period_data_sum = np.sum(same_period_dev_data_lists, axis=0)
+                        same_period_per_data_sum = np.sum(same_period_per_data_lists)
+                        # 求各项rate
+                        if same_period_data_sum[0] is None or same_period_data_sum[0] == 0:
+                            same_period_success_opening_rate = 0.0
+                        else:
+                            same_period_success_opening_rate = round((same_period_data_sum[1] / float(same_period_data_sum[0])) * 100, 2)  # 成功开场率
+
+                        if same_period_data_sum[1] is None or same_period_data_sum[1] == 0:
+                            same_period_business_introduction_rate = 0.0
+                        else:
+                            same_period_business_introduction_rate = round((same_period_data_sum[2] / float(same_period_data_sum[1])) * 100, 2)  # 业务介绍成功率
+
+                        if same_period_data_sum[2] is None or same_period_data_sum[2] == 0:
+                            same_period_answer_question_rate = 0.0
+                        else:
+                            same_period_answer_question_rate = round((same_period_data_sum[3] / float(same_period_data_sum[2])) * 100, 2)  # 解答问题成功率
+
+                        if same_period_data_sum[3] is None or same_period_data_sum[3] == 0:
+                            same_period_contract_pay_rate = 0.0
+                        else:
+                            same_period_contract_pay_rate = round((same_period_data_sum[4] / float(same_period_data_sum[3])) * 100, 2)  # 约定付款率
+
+                        if same_period_data_sum[1] is None or same_period_data_sum[1] == 0:
+                            same_period_transaction_rate = 0.0
+                        else:
+                            same_period_transaction_rate = round((same_period_per_data_sum / float(same_period_data_sum[1])) * 100, 2)  # 成交率
+
+                        # 存储同期百分比
+                        same_period_rate = [
+                            same_period_data_sum[0],
+                            same_period_data_sum[1],
+                            same_period_success_opening_rate,
+                            same_period_business_introduction_rate,
+                            same_period_answer_question_rate,
+                            same_period_contract_pay_rate,
+                            same_period_transaction_rate,
+                            same_period_per_data_sum
+                        ]
+                        same_period_rate_list.append(same_period_rate)
+                        same_period_list_count += 1
+
+                    print(same_period_rate_list.__len__(), same_period_rate_list)
+
+                for data_items in data_list:
+                    if data_items.__len__() <= 0:
+                        continue
+                    dev_data_lists = []
+                    per_data_lists = []
+                    for per_item in performance_data_list[list_count]:
+                        if per_item.source == 0:
+                            transaction_volume = per_item.transaction_volume
+                        else:
+                            transaction_volume = 0
+                        if transaction_volume is None:
+                            transaction_volume = 0
+                        per_data_lists.append(transaction_volume)
+                    for data_item in data_items:
+                        return_visit_volume = data_item.high_seas_volume
+                        success_opening_volume = data_item.success_opening_volume
+                        business_introduction_volume = data_item.business_introduction_volume
+                        answer_question_volume = data_item.answer_question_volume
+                        contract_pay_volume = data_item.contract_pay_volume
+                        quality_error_volume = data_item.quality_error_volume
+
+                        if return_visit_volume is None:
+                            return_visit_volume = 0
+                        if success_opening_volume is None:
+                            success_opening_volume = 0
+                        if business_introduction_volume is None:
+                            business_introduction_volume = 0
+                        if answer_question_volume is None:
+                            answer_question_volume = 0
+                        if contract_pay_volume is None:
+                            contract_pay_volume = 0
+                        if quality_error_volume is None:
+                            quality_error_volume = 0
+                        dev_data_list = [return_visit_volume, success_opening_volume, business_introduction_volume, answer_question_volume, contract_pay_volume, quality_error_volume]
+                        dev_data_lists.append(dev_data_list)
+
+                    if dev_data_lists.__len__() <= 0:  # 如果该用户没有数据则跳过
+                        continue
+                    data_sum = np.sum(dev_data_lists, axis=0)
+                    per_data_sum = np.sum(per_data_lists)
+                    # 求各项rate
+                    if data_sum[1] is None or data_sum[1] == 0:
+                        success_opening_rate = 0.0
+                    else:
+                        success_opening_rate = round((data_sum[2] / float(data_sum[1])) * 100, 2)  # 成功开场率
+
+                    if data_sum[2] is None or data_sum[2] == 0:
+                        business_introduction_rate = 0.0
+                    else:
+                        business_introduction_rate = round((data_sum[3] / float(data_sum[2])) * 100, 2)  # 业务介绍成功率
+
+                    if data_sum[3] is None or data_sum[3] == 0:
+                        answer_question_rate = 0.0
+                    else:
+                        answer_question_rate = round((data_sum[4] / float(data_sum[3])) * 100, 2)  # 解答问题成功率
+
+                    if data_sum[4] is None or data_sum[4] == 0:
+                        contract_pay_rate = 0.0
+                    else:
+                        contract_pay_rate = round((data_sum[5] / float(data_sum[4])) * 100, 2)  # 约定付款率
+
+                    if data_sum[0] is None or data_sum[0] == 0:
+                        transaction_rate = 0.0
+                    else:
+                        transaction_rate = round((per_data_sum / float(data_sum[0])) * 100, 2)  # 成交率
+                    return_visit_volume = str(data_sum[0])
+                    # 同期数据对比
+                    if same_period_rate_list.__len__() > 0:
+                        res_same_period_return_visit_volume = data_sum[0] - same_period_rate_list[list_count][0]
+                        res_same_period_success_opening_rate = round((success_opening_rate - same_period_rate_list[list_count][1]), 2)
+                        res_same_period_business_introduction_rate = round((business_introduction_rate - same_period_rate_list[list_count][2]), 2)
+                        res_same_period_answer_question_rate = round((answer_question_rate - same_period_rate_list[list_count][3]), 2)
+                        res_same_period_contract_pay_rate = round((contract_pay_rate - same_period_rate_list[list_count][4]), 2)
+                        res_same_period_transaction_rate = round((transaction_rate - same_period_rate_list[list_count][5]), 2)
+                        res_same_period_per_data_sum = per_data_sum - same_period_rate_list[list_count][7]
+
+                        if res_same_period_return_visit_volume > 0:
+                            return_visit_volume = str(data_sum[0]) + '(↑' + str(int(res_same_period_return_visit_volume)) + ')'
+                        elif res_same_period_return_visit_volume == 0:
+                            return_visit_volume = str(data_sum[0])
+                        else:
+                            return_visit_volume = str(data_sum[0]) + '(↓' + str(abs(res_same_period_return_visit_volume)) + ')'
+
+                        if res_same_period_success_opening_rate > 0:
+                            success_opening_rate = str(success_opening_rate) + '%(↑' + str(res_same_period_success_opening_rate) + '%)'
+                        elif res_same_period_success_opening_rate == 0:
+                            success_opening_rate = str(success_opening_rate) + '%'
+                        else:
+                            success_opening_rate = str(success_opening_rate) + '%(↓' + str(abs(res_same_period_success_opening_rate)) + '%)'
+
+                        if res_same_period_business_introduction_rate > 0:
+                            business_introduction_rate = str(business_introduction_rate) + '%(↑' + str(res_same_period_business_introduction_rate) + '%)'
+                        elif res_same_period_business_introduction_rate == 0:
+                            business_introduction_rate = str(business_introduction_rate) + '%'
+                        else:
+                            business_introduction_rate = str(business_introduction_rate) + '%(↓' + str(abs(res_same_period_business_introduction_rate)) + '%)'
+
+                        if res_same_period_answer_question_rate > 0:
+                            answer_question_rate = str(answer_question_rate) + '%(↑' + str(res_same_period_answer_question_rate) + '%)'
+                        elif res_same_period_answer_question_rate == 0:
+                            answer_question_rate = str(answer_question_rate) + '%'
+                        else:
+                            answer_question_rate = str(answer_question_rate) + '%(↓' + str(abs(res_same_period_answer_question_rate)) + '%)'
+
+                        if res_same_period_contract_pay_rate > 0:
+                            contract_pay_rate = str(contract_pay_rate) + '%(↑' + str(res_same_period_contract_pay_rate) + '%)'
+                        elif res_same_period_contract_pay_rate == 0:
+                            contract_pay_rate = str(contract_pay_rate) + '%'
+                        else:
+                            contract_pay_rate = str(contract_pay_rate) + '%(↓' + str(abs(res_same_period_contract_pay_rate)) + '%)'
+
+                        if res_same_period_transaction_rate > 0:
+                            transaction_rate = str(transaction_rate) + '%(↑' + str(res_same_period_transaction_rate) + '%)'
+                        elif res_same_period_transaction_rate == 0:
+                            transaction_rate = str(transaction_rate) + '%'
+                        else:
+                            transaction_rate = str(transaction_rate) + '%(↓' + str(abs(res_same_period_transaction_rate)) + '%)'
+
+                        if res_same_period_per_data_sum > 0:
+                            per_data_sum = str(int(per_data_sum)) + '(↑' + str(int(res_same_period_per_data_sum)) + ')'
+                        elif res_same_period_per_data_sum == 0:
+                            per_data_sum = str(int(per_data_sum))
+                        else:
+                            per_data_sum = str(int(per_data_sum)) + '(↓' + str(abs(res_same_period_per_data_sum)) + ')'
+                    else:
+                        transaction_rate = str(transaction_rate) + '%'
+                        success_opening_rate = str(success_opening_rate) + '%'
+                        business_introduction_rate = str(business_introduction_rate) + '%'
+                        contract_pay_rate = str(contract_pay_rate) + '%'
+                        answer_question_rate = str(answer_question_rate) + '%'
+                    ret_data = {
+                        'high_seas_volume': str(return_visit_volume),
+                        'success_opening_rate': str(success_opening_rate),
+                        'business_introduction_rate': str(business_introduction_rate),
+                        'answer_question_rate': str(answer_question_rate),
+                        'contract_pay_rate': str(contract_pay_rate),
+                        'transaction_rate': str(transaction_rate),
+                        'per_data_sum': str(per_data_sum),
+                    }
+                    ret_month = months[month].split('-')
+                    ret_data.setdefault('date', str(ret_month[0] + '年' + ret_month[1] + '月'))
+                    rex = re.compile(r'(.*?)[%]', re.S)
+                    echarts_data_item = {
+                        'success_opening_rate': float(re.findall(rex, success_opening_rate)[0]),
+                        'business_introduction_rate': float(re.findall(rex, business_introduction_rate)[0]),
+                        'answer_question_rate': float(re.findall(rex, answer_question_rate)[0]),
+                        'contract_pay_rate': float(re.findall(rex, contract_pay_rate)[0]),
+                        'transaction_rate': float(re.findall(rex, transaction_rate)[0]),
+                    }
+                    if obj == 'group':
+                        group_name = GroupModel.objects.get(id=id_list[list_count]).group_name
+                        ret_data.setdefault('name', group_name)
+                        echarts_data_item.setdefault('name', group_name)
+                    if obj == 'person':
+                        username = PersonModel.objects.get(id=id_list[list_count]).username
+                        ret_data.setdefault('name', username)
+                        echarts_data_item.setdefault('name', username)
+                    res_data.append(ret_data)
+                    echarts_data.append(echarts_data_item)
+                    list_count += 1
+                    res_count += 1
+            else:
+                return JsonResponse(status=status.HTTP_400_BAD_REQUEST, data={'code': 10001, 'msg': '参数错误'})
+        return JsonResponse(status=status.HTTP_200_OK, data={
+            "code": 0,
+            "msg": "success",
+            "count": res_count,
+            "data": {
+                'datasheet': res_data[(int(page) - 1) * int(limit):int(page) * int(limit)],
+                'echarts': echarts_data[(int(page) - 1) * int(limit):int(page) * int(limit)]
+            }
+        })
+
+
+@exception(logger)
+def lifting_list_data(request):
+    date_range = request.GET.get('date-range')
+    num = request.GET.get('num')
+    if not num or num == '' or num == 'undefined':
+        num = 10
+    else:
+        num = int(num)
+
+    person_data = PersonModel.objects.all()
+    development_data = DevelopmentDataModel.objects.all()
+    return_data = ReturnDataModel.objects.all()
+    performance_data = PerformanceDataModel.objects.all()
+    # 过滤时间
+    if date_range is not None and date_range != '' and date_range != 'undefined':
+        try:
+            start = str(date_range).split(' - ')[0]
+            end = str(date_range).split(' - ')[1]
+        except:
+            start = end = str(date_range)
+        if start is not None and start != '' and end is not None and end != '':
+            days = utils.getEveryDay(start, end).__len__()
+            start = utils.parse_ymd(start + ' 00:00:00')
+            end = utils.parse_ymd(end + ' 23:59:59')
+            same_period_development_data = development_data.filter(data_time__range=(utils.from_before_n_day(start, days), utils.from_before_n_day(end, days)))
+            same_period_return_data = return_data.filter(data_time__range=(utils.from_before_n_day(start, days), utils.from_before_n_day(end, days)))
+            same_period_performance_data = performance_data.filter(data_time__range=(utils.from_before_n_day(start, days), utils.from_before_n_day(end, days)))
+            development_data = development_data.filter(data_time__range=(start, end))
+            return_data = return_data.filter(data_time__range=(start, end))
+            performance_data = performance_data.filter(data_time__range=(start, end))
+        else:
+            same_period_development_data = development_data.filter(data_time__range=(utils.before_n_day(15), utils.before_n_day(9)))
+            same_period_return_data = return_data.filter(data_time__range=(utils.before_n_day(15), utils.before_n_day(9)))
+            same_period_performance_data = performance_data.filter(data_time__range=(utils.before_n_day(15), utils.before_n_day(9)))
+            development_data = development_data.filter(data_time__range=(utils.before_n_day(8), utils.before_n_day(2)))
+            return_data = return_data.filter(data_time__range=(utils.before_n_day(8), utils.before_n_day(2)))
+            performance_data = performance_data.filter(data_time__range=(utils.before_n_day(8), utils.before_n_day(2)))
+    return_person_dev_list = []
+    return_person_return_list = []
+    return_person_performance_list = []
+    return_person_rate_list = []
+
+    for person in person_data:
+        ret_person_dev = {}
+        ret_person_return = {}
+        ret_person_performance = {}
+        ret_person_rate = {}
+
+        same_period_person_dev_data_list = [int(item.new_customer_volume) for item in same_period_development_data.filter(person_id=person) if item.new_customer_volume is not None and item.new_customer_volume != '']
+        same_period_person_dev_data = int(np.sum(same_period_person_dev_data_list, axis=0))
+        same_period_person_return_data_list = [int(item.return_visit_volume) for item in same_period_return_data.filter(person_id=person) if item.return_visit_volume is not None and item.return_visit_volume != '']
+        same_period_person_return_data_data = int(np.sum(same_period_person_return_data_list, axis=0))
+        same_period_person_per_data_list = [int(item.transaction_volume) for item in same_period_performance_data.filter(person_id=person) if item.transaction_volume is not None and item.transaction_volume != '']
+        same_period_person_per_data = int(np.sum(same_period_person_per_data_list, axis=0))
+        same_period_person_dev_success_opening_data_list = [int(item.success_opening_volume) for item in same_period_development_data.filter(person_id=person) if item.success_opening_volume is not None and item.new_customer_volume != '']
+        same_period_person_dev_success_opening_data = np.sum(same_period_person_dev_success_opening_data_list, axis=0)
+
+        person_dev_data_list = [int(item.new_customer_volume) for item in development_data.filter(person_id=person) if item.new_customer_volume is not None and item.new_customer_volume != '']
+        person_dev_data = int(np.sum(person_dev_data_list, axis=0))
+
+        person_return_data_list = [int(item.return_visit_volume) for item in return_data.filter(person_id=person) if item.return_visit_volume is not None and item.return_visit_volume != '']
+        person_return_data_data = int(np.sum(person_return_data_list, axis=0))
+
+        person_per_data_list = [int(item.transaction_volume) for item in performance_data.filter(person_id=person) if item.transaction_volume is not None and item.transaction_volume != '']
+        person_per_data = int(np.sum(person_per_data_list, axis=0))
+
+        person_dev_success_opening_data_list = [int(item.success_opening_volume) for item in development_data.filter(person_id=person) if item.success_opening_volume is not None and item.new_customer_volume != '']
+        person_dev_success_opening_data = np.sum(person_dev_success_opening_data_list, axis=0)
+
+        person_dev_business_data_list = [int(item.business_introduction_volume) for item in development_data.filter(person_id=person) if item.business_introduction_volume is not None and item.new_customer_volume != '']
+        person_dev_business_data = np.sum(person_dev_business_data_list, axis=0)
+
+        if person_dev_success_opening_data == 0 or person_dev_success_opening_data is None:
+            person_dev_business_rate = 0.0
+        else:
+            person_dev_business_rate = round((person_dev_business_data / person_dev_success_opening_data), 2)
+
+        if person_dev_data:
+            person_dev_data_rate = round(float(same_period_person_dev_data - person_dev_data) / person_dev_data, 2)
+        else:
+            person_dev_data_rate = 0.0
+
+        if person_return_data_data:
+            person_return_data_data_rate = round(float(same_period_person_return_data_data - person_return_data_data) / person_return_data_data, 2)
+        else:
+            person_return_data_data_rate = 0.0
+
+        if person_per_data:
+            person_per_data_rate = round(float(same_period_person_per_data - person_per_data) / person_per_data, 2)
+        else:
+            person_per_data_rate = 0.0
+
+        ret_person_rate['person_name'] = ret_person_dev['person_name'] = ret_person_return['person_name'] = ret_person_performance['person_name'] = person.username
+        ret_person_rate['group_name'] = ret_person_dev['group_name'] = ret_person_return['group_name'] = ret_person_performance['group_name'] = person.group_id.group_name
+        ret_person_rate['business_rate'] = person_dev_business_rate
+
+        ret_person_dev['new_addition'] = person_dev_data_rate
+        ret_person_return['return_value'] = person_return_data_data_rate
+        ret_person_performance['transaction_value'] = person_per_data_rate
+
+        return_person_dev_list.append(ret_person_dev)
+        return_person_return_list.append(ret_person_return)
+        return_person_performance_list.append(ret_person_performance)
+        return_person_rate_list.append(ret_person_rate)
+
+    # 排序
+    return_person_dev_list = sorted(return_person_dev_list, key=lambda e: e.__getitem__('new_addition'), reverse=True)
+    return_person_return_list = sorted(return_person_return_list, key=lambda e: e.__getitem__('return_value'), reverse=True)
+    return_person_performance_list = sorted(return_person_performance_list, key=lambda e: e.__getitem__('transaction_value'), reverse=True)
+    return_person_rate_list = sorted(return_person_rate_list, key=lambda e: e.__getitem__('business_rate'), reverse=True)
+
+    # 升榜
+    if development_data.__len__() <= 0:
+        top_return_person_dev_list = []
+    else:
+        top_return_person_dev_list = return_person_dev_list[:num]
+
+    if return_data.__len__() <= 0:
+        top_return_person_return_list = []
+    else:
+        top_return_person_return_list = return_person_return_list[:num]
+
+    if performance_data.__len__() <= 0:
+        top_return_person_performance_list = []
+    else:
+        top_return_person_performance_list = return_person_performance_list[:num]
+
+    # 降榜
+    if development_data.__len__() <= 0:
+        tail_return_person_dev_list = []
+    else:
+        tail_return_person_dev_list = return_person_dev_list[:-num - 1:-1]
+
+    if return_data.__len__() <= 0:
+        tail_return_person_return_list = []
+    else:
+        tail_return_person_return_list = return_person_return_list[:-num - 1:-1]
+
+    if performance_data.__len__() <= 0:
+        tail_return_person_performance_list = []
+    else:
+        tail_return_person_performance_list = return_person_performance_list[:-num - 1:-1]
+
+    # 降榜
+    for index, item in enumerate(tail_return_person_dev_list):
+        if item['new_addition'] > 0:
+            item.setdefault('tail_new_addition', '↑' + str(abs(item['new_addition'] * 100)) + '%')
+        elif item['new_addition'] == 0:
+            item.setdefault('tail_new_addition', str(item['new_addition'] * 100) + '%')
+        else:
+            item.setdefault('tail_new_addition', '↓' + str(abs(item['new_addition'] * 100)) + '%')
+        item.setdefault('tail_ranking', int(index) + 1)
+        item.setdefault('tail_person_name', item['person_name'])
+        item.setdefault('tail_group_name', item['group_name'])
+        del item['new_addition']
+        del item['person_name']
+        del item['group_name']
+
+    for index, item in enumerate(tail_return_person_return_list):
+        if item['return_value'] > 0:
+            item.setdefault('tail_return_value', '↑' + str(abs(item['return_value'] * 100)) + '%')
+        elif item['return_value'] == 0:
+            item.setdefault('tail_return_value', str(item['return_value'] * 100) + '%')
+        else:
+            item.setdefault('tail_return_value', '↓' + str(abs(item['return_value'] * 100)) + '%')
+        item.setdefault('tail_ranking', int(index) + 1)
+        del item['return_value']
+        item.setdefault('tail_person_name', item['person_name'])
+        item.setdefault('tail_group_name', item['group_name'])
+        del item['person_name']
+        del item['group_name']
+
+    for index, item in enumerate(tail_return_person_performance_list):
+        if item['transaction_value'] > 0:
+            item.setdefault('tail_transaction_value', '↑' + str(abs(item['transaction_value'] * 100)) + '%')
+        elif item['transaction_value'] == 0:
+            item.setdefault('tail_transaction_value', str(item['transaction_value'] * 100) + '%')
+        else:
+            item.setdefault('tail_transaction_value', '↓' + str(abs(item['transaction_value'] * 100)) + '%')
+        item.setdefault('tail_ranking', int(index) + 1)
+        del item['transaction_value']
+        item.setdefault('tail_person_name', item['person_name'])
+        item.setdefault('tail_group_name', item['group_name'])
+        del item['person_name']
+        del item['group_name']
+
+    # 升榜
+    for index, item in enumerate(top_return_person_dev_list):
+        if item['new_addition'] > 0:
+            item['new_addition'] = '↑' + str(item['new_addition'] * 100) + '%'
+        elif item['new_addition'] == 0:
+            item['new_addition'] = str(item['new_addition'] * 100) + '%'
+        else:
+            item['new_addition'] = '↓' + str(abs(item['new_addition'] * 100)) + '%'
+        item['ranking'] = int(index) + 1
+
+    for index, item in enumerate(top_return_person_return_list):
+        if item['return_value'] > 0:
+            item['return_value'] = '↑' + str(item['return_value'] * 100) + '%'
+        elif item['return_value'] == 0:
+            item['return_value'] = str(item['return_value'] * 100) + '%'
+        else:
+            item['return_value'] = '↓' + str(abs(item['return_value'] * 100)) + '%'
+        item['ranking'] = int(index) + 1
+
+    for index, item in enumerate(top_return_person_performance_list):
+        if item['transaction_value'] > 0:
+            item['transaction_value'] = '↑' + str(item['transaction_value'] * 100) + '%'
+        elif item['transaction_value'] == 0:
+            item['transaction_value'] = str(item['transaction_value'] * 100) + '%'
+        else:
+            item['transaction_value'] = '↓' + str(abs(item['transaction_value'] * 100)) + '%'
+        item['ranking'] = int(index) + 1
+
+    for index, item in enumerate(return_person_rate_list):
+        item['business_rate'] = str(item['business_rate']) + '%'
+        item['ranking'] = int(index) + 1
+
+    # 合并字典
+    ret_new_list = []
+    ret_return_list = []
+    ret_transaction_list = []
+    for index in range(num):
+        ret_new_list.append(dict(top_return_person_dev_list[index], **tail_return_person_dev_list[index]))
+        ret_return_list.append(dict(top_return_person_return_list[index], **tail_return_person_return_list[index]))
+        ret_transaction_list.append(dict(top_return_person_performance_list[index], **tail_return_person_performance_list[index]))
+
+    return JsonResponse(status=status.HTTP_200_OK,
+                        data={'code': 0,
+                              'msg': 'success',
+                              'count': 10,
+                              'data':
+                                  {
+                                      'ret_new': ret_new_list,
+                                      'ret_return': ret_return_list,
+                                      'ret_transaction': ret_transaction_list,
+                                      'ret_rate': return_person_rate_list[:num],
                                   }
                               })

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+<head>
+    <meta charset="UTF-8">
+    <title>业务报表系统 - 升降榜</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    {# <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>#}
+    <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1.0,minimum-scale=0.4,maximum-scale=3.0"/>
+    <link rel="stylesheet" href="../static/css/font.css">
+    <link rel="stylesheet" href="../static/fonts/iconfont.css">
+    <link rel="stylesheet" href="../static/css/xadmin.css">
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/daterangepicker.css">
+    <script src="../static/js/jquery.min.js" charset="utf-8"></script>
+    <script src="../static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../static/js/xadmin.js"></script>
+    <script type="text/javascript" src="../static/js/moment.js"></script>
+    <script type="text/javascript" src="../static/js/daterangepicker.js"></script>
+    <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+<body>
+<div class="x-nav">
+    <span class="layui-breadcrumb">
+        <a href="/index/">首页</a><a><cite>升降榜</cite></a>
+    </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+    </a>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <div class="layui-form layui-col-space5">
+                        <div class="layui-inline layui-show-xs-block">
+                            <select id="num" name="num" lay-verify="num">
+                                <option value="">显示前多少名</option>
+                                <option value="10" selected>前十名</option>
+                                <option value="15">前十五名</option>
+                            </select>
+                        </div>
+                        <div class="layui-inline layui-show-xs-block">
+                            <button type="button" class="layui-btn layui-btn-primary" name="daterange-btn" id="daterange-btn">
+                                <span style="display: none">
+                                </span>
+                                <span>
+                                  <i class="icon iconfont icon-calendar1"></i> 日期选择
+                                </span>
+                                <i class="icon iconfont icon-danxian-youjiantou-copy"></i>
+                            </button>
+                        </div>
+                        <div class="layui-inline layui-show-xs-block">
+                            <button id="search" class="layui-btn" lay-filter="search" onclick="search_btn();return false;"><i class="layui-icon">&#xe615;</i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-card-body ">
+                    <div class="layui-tab">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">新加</li>
+                            <li>回访</li>
+                            <li>成交</li>
+                            <li>业务介绍成功率</li>
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <table class="layui-hide" id="new-table" lay-filter="new-table">
+                                </table>
+                            </div>
+                            <div class="layui-tab-item">
+                                <table class="layui-hide" id="return-table" lay-filter="return-table"></table>
+                            </div>
+                            <div class="layui-tab-item">
+                                <table class="layui-hide" id="transaction-table" lay-filter="transaction-table"></table>
+                            </div>
+                            <div class="layui-tab-item">
+                                <table class="layui-hide" id="rate-table" lay-filter="rate-table"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'laydate', 'table'], function () {
+        var table = layui.table;
+        var laydate = layui.laydate;
+        var form = layui.form;
+
+        form.render();
+        laydate.render({
+            elem: '#date-range', range: true
+        });
+
+        $('#daterange-btn > span:nth-child(1)').html(moment().subtract(7, 'days').format('YYYY-MM-DD') + ' - ' + moment().subtract(1, 'days').format('YYYY-MM-DD'));
+        $('#daterange-btn > span:nth-child(2)').html('过去七天');
+        $('.ranges_1 ul').remove();
+        $('#daterange-btn').daterangepicker({
+                ranges: {
+                    '今天': [moment(), moment()],
+                    '昨天': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    '前天': [moment().subtract(2, 'days'), moment().subtract(2, 'days')],
+                    '过去7天': [moment().subtract(7, 'days'), moment().subtract(1, 'days')],
+                    '过去14天': [moment().subtract(14, 'days'), moment().subtract(1, 'days')],
+                    '过去30天': [moment().subtract(30, 'days'), moment().subtract(1, 'days')],
+                    '上月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    '过去90天': [moment().subtract(90, 'days'), moment().subtract(1, 'days')],
+                    '过去半年': [moment().subtract(180, 'days'), moment().subtract(1, 'days')],
+                    '上周(周日至周六)': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
+                    '上周(周一至周日)': [moment().subtract(1, 'week').startOf('week').subtract(-1, 'days'), moment().subtract(1, 'week').endOf('week').subtract(-1, 'days')],
+                    '自选': [moment(), [moment(), moment().subtract(-1, 'days')],],
+                },
+                startDate: moment().subtract(7, 'days'),
+                endDate: moment().subtract(1, 'days'),
+                maxDate: moment(),
+            }, function (start, end, label) {
+                console.log(label);
+                if (label == '今天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('今天');
+                } else if (label == '昨天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('昨天');
+                } else if (label == '前天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('前天');
+                } else if (label == '过去7天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('过去7天');
+                } else if (label == '过去14天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('过去14天');
+                } else if (label == '过去30天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('过去30天');
+                } else if (label == '上月') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('上月');
+                } else if (label == '过去90天') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('过去90天');
+                } else if (label == '过去半年') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('过去半年');
+                } else if (label == '上周(周日至周六)') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('上周(周日至周六)');
+                } else if (label == '上周(周一至周日)') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html('上周(周一至周日)');
+                } else if (label == '自选') {
+                    $('#daterange-btn > span:nth-child(1)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                    $('#daterange-btn > span:nth-child(2)').html(start.format('YYYY-MM-DD') + ' - ' + end.format('YYYY-MM-DD'));
+                }
+                console.log($('#daterange-btn > span:nth-child(1)').html());
+            }
+        );
+
+        table.render({
+            elem: '#new-table',
+            url: '/api/lifting-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
+            cellMinWidth: 80,
+            height: 'full-200',
+            title: '用户数据表',
+            cols: [[
+                {title: '升榜', align: 'center', colspan: 4},
+                {title: '降榜', align: 'center', colspan: 4},
+            ],[
+                {field: 'ranking', title: '排名', align: 'center', width: 120},
+                {field: 'person_name', title: '用户名', align: 'center', width: 120},
+                {field: 'group_name', title: '组别', align: 'center', width: 120},
+                {field: 'new_addition', title: '新加量 - 增长率', align: 'center', width: 120},
+                {field: 'tail_ranking', title: '倒排名', align: 'center', width: 120},
+                {field: 'tail_person_name', title: '用户名', align: 'center', width: 120},
+                {field: 'tail_group_name', title: '组别', align: 'center', width: 120},
+                {field: 'tail_new_addition', title: '新加量 - 增长率', align: 'center', width: 120},
+            ]],
+            limit: 20,
+            parseData: function (res) {
+                console.log(res);
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.ret_new
+                };
+            }
+        });
+
+        table.render({
+            elem: '#return-table',
+            url: '/api/lifting-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
+            cellMinWidth: 80,
+            height: 'full-200',
+            title: '用户数据表',
+            cols: [[
+                {title: '升榜', align: 'center', colspan: 4},
+                {title: '降榜', align: 'center', colspan: 4},
+            ],[
+                {field: 'ranking', title: '排名', align: 'center', width: 120},
+                {field: 'person_name', title: '用户名', align: 'center', width: 120},
+                {field: 'group_name', title: '组别', align: 'center', width: 120},
+                {field: 'return_value', title: '回访量 - 增长率', align: 'center', width: 120},
+                {field: 'tail_ranking', title: '倒排名', align: 'center', width: 120},
+                {field: 'tail_person_name', title: '用户名', align: 'center', width: 120},
+                {field: 'tail_group_name', title: '组别', align: 'center', width: 120},
+                {field: 'tail_return_value', title: '回访量 - 增长率', align: 'center', width: 120},
+            ]],
+            limit: 20,
+            parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.ret_return
+                };
+            }
+        });
+
+        table.render({
+            elem: '#transaction-table',
+            url: '/api/lifting-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
+            cellMinWidth: 80,
+            height: 'full-200',
+            title: '用户数据表',
+            cols: [[
+                {title: '升榜', align: 'center', colspan: 4},
+                {title: '降榜', align: 'center', colspan: 4},
+            ],[
+                {field: 'ranking', title: '排名', align: 'center', width: 120},
+                {field: 'person_name', title: '用户名', align: 'center', width: 120},
+                {field: 'group_name', title: '组别', align: 'center', width: 120},
+                {field: 'transaction_value', title: '成交量 - 增长率', align: 'center', width: 120},
+                {field: 'tail_ranking', title: '倒排名', align: 'center', width: 120},
+                {field: 'tail_person_name', title: '用户名', align: 'center', width: 120},
+                {field: 'tail_group_name', title: '组别', align: 'center', width: 120},
+                {field: 'tail_transaction_value', title: '成交量 - 增长率', align: 'center', width: 120},
+            ]],
+            limit: 20,
+            parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.ret_transaction
+                };
+            }
+        });
+
+        table.render({
+            elem: '#rate-table',
+            url: '/api/lifting-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
+            cellMinWidth: 80,
+            height: 'full-200',
+            title: '用户数据表',
+            cols: [[
+                {title: '升榜', align: 'center', colspan: 4},
+            ],[
+                {field: 'ranking', title: '排名', align: 'center', width: 120},
+                {field: 'person_name', title: '用户名', align: 'center', width: 120},
+                {field: 'group_name', title: '组别', align: 'center', width: 120},
+                {field: 'business_rate', title: '业务介绍成功率', align: 'center', width: 150},
+            ]],
+            limit: 20,
+            parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data.ret_rate
+                };
+            }
+        });
+    });
+
+    function search_btn() {
+        layui.table.reload('new-table', {
+            url: '/api/lifting-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
+        });
+        layui.table.reload('return-table', {
+            url: '/api/lifting-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
+        });
+        layui.table.reload('transaction-table', {
+            url: '/api/lifting-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
+        });
+        layui.table.reload('rate-table', {
+            url: '/api/lifting-data/?date-range=' + $('#daterange-btn span').html() + '&num=' + $('#num').val(),
+        });
+    }
+</script>
+</body>
+</html>
