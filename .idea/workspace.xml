@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7cb8bc3e-35cd-4d6d-9511-d068ec720aa7" name="默认更改列表" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Performance_Report_api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Performance_Report_api.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/python.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/python.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Report/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -193,6 +190,7 @@
       <workItem from="1571045377738" duration="189000" />
       <workItem from="1571047479610" duration="671000" />
       <workItem from="1571048506596" duration="3460000" />
+      <workItem from="1571104532051" duration="212000" />
     </task>
     <servers />
   </component>

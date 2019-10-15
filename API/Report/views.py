@@ -1930,6 +1930,8 @@ def data_conversion_rate(request):
                     echarts_data.setdefault('name', username)
                 item_list.append(res_data)
                 echarts_list.append(echarts_data)
+                list_count += 1
+
             rows = {
                 'code': 0,
                 'msg': 'success',
@@ -2186,6 +2188,8 @@ def data_conversion_rate(request):
                     echarts_data.setdefault('name', username)
                 item_list.append(res_data)
                 echarts_list.append(echarts_data)
+                list_count += 1
+                
             rows = {
                 'code': 0,
                 'msg': 'success',
