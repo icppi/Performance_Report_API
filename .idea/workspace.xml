@@ -2,19 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7cb8bc3e-35cd-4d6d-9511-d068ec720aa7" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/static/css/daterangepicker.monthpicker.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/daterangepicker.monthpicker.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/lifting-list-data.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/month-statistical-report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Performance_Report_api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Performance_Report_api.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/python.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/python.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/Report/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/Report/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/API/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Performance_Report_API/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Performance_Report_API/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Performance_Report_API/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Performance_Report_API/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/js/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/utils.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/statistical-report.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/statistical-report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.sh" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -68,16 +60,15 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1R7u98L5jnh2sZKEcpwnH59KI15" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
-    <ConfirmationsSetting value="2" id="Add" />
-  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="DatabaseDriversLRU" value="mysql" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/templates" />
+    <property name="add_unversioned_files" value="$PROJECT_DIR$/logs/performance_run.log" />
+    <property name="last_opened_file_path" value="E:/PyQt5UI/untitled.ui" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
-    <property name="settings.editor.selected.configurable" value="configurable.group.project" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -194,6 +185,14 @@
       <workItem from="1570603505675" duration="9386000" />
       <workItem from="1570667998562" duration="31832000" />
       <workItem from="1570767460475" duration="17094000" />
+      <workItem from="1570841312963" duration="55000" />
+      <workItem from="1570841412339" duration="4101000" />
+      <workItem from="1570850962747" duration="3562000" />
+      <workItem from="1570866550507" duration="1276000" />
+      <workItem from="1571016738257" duration="3661000" />
+      <workItem from="1571045377738" duration="189000" />
+      <workItem from="1571047479610" duration="671000" />
+      <workItem from="1571048506596" duration="3460000" />
     </task>
     <servers />
   </component>
